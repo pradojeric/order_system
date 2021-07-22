@@ -1,0 +1,113 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable, SoftDeletes;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'first_name',
+        'middle_name',
+        'last_name',
+        'email',
+        'password',
+        'role_id',
+        'employee_no',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    /**
+     * Get the roles that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role->name == $role;
+    }
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->middle_name} {$this->last_name}";
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'waiter_id');
+    }
+
+    public function ordersBy($action = null)
+    {
+        if ($action == null) {
+            $total = $this->orders->sum('total');
+        } else {
+            $total = $this->orders->where('action', $action)->sum('total');
+        }
+        return "₱ " . number_format($total, 2, '.', ',');
+    }
+
+    public function getTip()
+    {
+        $tip = $this->orders->map(function ($order) {
+            return ['orderTip' => $order->tip * $order->total / 100];
+        })->sum('orderTip');
+        return "₱ " . $tip;
+    }
+
+    public function trashedOrders()
+    {
+        return $this->orders->where('deleted_at', '!=', NULL)->count();
+    }
+
+    public function orderErrors()
+    {
+        $orders =  $this->orders->where('deleted_at', '==', NULL);
+        $orderDetailsSum = $orders->map(function ($order) {
+            return $order->orderDetails()->onlyTrashed()->count();
+        })->sum();
+        $customDetailSum = $orders->map(function ($order) {
+            return $order->customOrderDetails()->onlyTrashed()->count();
+        })->sum();
+        return $orderDetailsSum + $customDetailSum;
+    }
+
+    public function assignTables()
+    {
+        return $this->belongsToMany(Table::class, 'table_waiter', 'waiter_id', 'table_id')->withPivot(['table_name']);
+    }
+}
