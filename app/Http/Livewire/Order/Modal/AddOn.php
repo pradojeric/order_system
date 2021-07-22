@@ -22,6 +22,10 @@ class AddOn extends Modal
         'sideDish' => 'required'
     ];
 
+    protected $messages = [
+        'sideDish.required' => 'Please choose one side dish'
+    ];
+
     public function mount()
     {
         $this->addOns = Dish::sideDish()->get();

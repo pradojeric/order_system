@@ -1,8 +1,5 @@
 <div>
     <div class="border border-gray-300 rounded-lg p-1 flex flex-col h-64 justify-between flex-grow" x-data>
-        <button class="text-right" @click.prevent="print('{{ $order->id }}')">
-            <i class="fa fa-print"></i>
-        </button>
         <div class="flex">
             <div class="w-64 p-2 h-48">
                 @if($order)

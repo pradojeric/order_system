@@ -8,11 +8,11 @@
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button class="flex-shrink-0 flex items-center" onclick="event.preventDefault();
+                        <button class="flex-shrink-0 flex items-center focus:border-transparent" onclick="event.preventDefault();
                             this.closest('form').submit();">
                             <x-application-logo class="block h-10 w-auto fill-current text-gray-600" />
-                            <span class="ml-4">
-                                {{ __('Log out') }}
+                            <span class="ml-2 uppercase font-bold">
+                                {{ __('Log Out') }}
                             </span>
                         </button>
 

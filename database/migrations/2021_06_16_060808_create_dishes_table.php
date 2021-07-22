@@ -19,7 +19,7 @@ class CreateDishesTable extends Migration
             $table->string('name');
             $table->longText('description');
             $table->float('price');
-            $table->enum('status', [0, 1])->default(0);
+            $table->enum('status', [0, 1])->default(1);
             $table->timestamps();
         });
     }

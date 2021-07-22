@@ -64,26 +64,32 @@ class OrderController extends Controller
             $foods = [];
             $drinks = [];
             foreach ($order->orderDetails as $i) {
+                if($i->printed) continue;
                 if($i->isDrink()){
                     $drinks[] = new item($i->dish->name, $i->pcs);
                 }else{
                     if($i->side_dishes)
                     {
-                        $dishName = "$i->dish->name\n$i->side_dishes['side_name']";
+                        $dishName = $i->dish->name."\n".$i->side_dishes['side_name'];
                     }else{
                         $dishName = $i->dish->name;
                     }
                     $foods[] = new item($dishName, $i->pcs);
                 }
+                $i->printed = true;
+                $i->save();
             }
 
             foreach ($order->customOrderDetails as $i) {
+                if($i->printed) continue;
                 $itemName = $i->name."\n".$i->description;
                 if($i->isDrink()){
                     $drinks[] = new item($itemName, $i->pcs);
                 }else{
                     $foods[] = new item($itemName, $i->pcs);
                 }
+                $i->printed = true;
+                $i->save();
             }
 
             if(count($foods) > 0) {

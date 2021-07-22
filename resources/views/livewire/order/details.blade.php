@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-center flex-col sm:flex-row mt-3">
                 <div class="flex flex-col w-full">
-                    <div class="grid grid-cols-2 md:grid-cols-8 sm:grid-cols-4">
+                    <div class="grid grid-cols-3 md:grid-cols-5">
                         @foreach ($categories as $category)
                         <x-menu-card :img="asset($category->icon)" :category="$category"
                             wire:click.prevent="viewDishes({{ $category->id ?? null }})"
@@ -12,10 +12,15 @@
                         <x-menu-card :img=" asset('icons/Custom.png')" category="Custom"
                             wire:click.prevent="$emitTo('order.custom', 'addCustomDish')" />
                     </div>
+                    <div wire:loading wire:target="viewDishes">
+                        <div class="flex justify-center items-center mt-3 w-full">
+                            <i class="fas fa-circle-notch text-red-700 text-3xl fa-spin"></i>
+                        </div>
+                    </div>
                     <div class="flex max-h-full mt-3">
-                        <div class="w-full">
+                        <div class="w-full" wire:loading.remove wire:target="viewDishes">
                             @forelse ($dishes as $index => $dish)
-                            <div
+                            <div wire:key="{{ $dish->id }}"
                                 class="flex border justify-between items-center py-3 pl-2 pr-3 text-xs lg:text-sm @if(!$dish->status) text-gray-300 @endif">
                                 <div class="flex items-center">
                                     <button type="button" wire:click.prevent.lazy="decrementQuantity({{ $index }})"><i
@@ -30,13 +35,24 @@
                                         @else
                                             wire:click.prevent="addDish({{ $dish->id }}, {{ $dishes[$index]['quantity'] }}, {{ $dishes[$index]['side'] }})"
                                         @endif
-                                        class="text-white p-2 rounded ml-3
-                                        {{ !$dish->status ? 'bg-gray-300' : 'bg-green-500 hover:bg-green-700'  }}">Add
+                                        class="text-white p-2 rounded ml-3 w-10
+                                        {{ !$dish->status ? 'bg-gray-300' : 'bg-green-500 hover:bg-green-700' }}">
+                                        <span wire:loading.remove wire:target="addDish({{ $dish->id }}, {{ $dishes[$index]['quantity'] }}, {{ $dishes[$index]['side'] }})">
+                                            <i class="fas fa-plus text-lg"></i>
+                                        </span>
+                                        <span wire:loading wire:target="addDish({{ $dish->id }}, {{ $dishes[$index]['quantity'] }}, {{ $dishes[$index]['side'] }})">
+                                            <i class="fas fa-circle-notch text-lg fa-spin"></i>
+                                        </span>
                                     </button>
                                 </div>
-                                <span>
-                                    {{ $dish->name }}
-                                </span>
+                                <div class="flex flex-col text-center">
+                                    <span>
+                                        {{ $dish->name }}
+                                    </span>
+                                    <span class="text-xs text-green-900">
+                                        {{ $dish->add_on ? '(with side dish)' : '' }}
+                                    </span>
+                                </div>
                                 <span>
                                     {{ $dish->price_formatted }}
                                 </span>

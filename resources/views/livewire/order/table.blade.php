@@ -6,9 +6,6 @@
                 {{ Auth::user()->assignTables->find($table->id)->pivot->table_name ?? $table->name }} ({{ $table->pax }} pax)
             </strong>
             <div class="text-white">
-                <button class="mr-2" @if($hasOrder) x-on:click.prevent="print('{{ $table->order()->id }}')" @endif>
-                    <i class="fa fa-print"></i>
-                </button>
                 <button
                     @click.prevent="window.livewire.emitTo('order.modal.edit-table', 'editTable', {{ $table->id }})">
                     <i class="fa fa-edit"></i>

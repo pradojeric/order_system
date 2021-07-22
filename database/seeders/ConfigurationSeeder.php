@@ -17,6 +17,7 @@ class ConfigurationSeeder extends Seeder
         DB::table('configurations')->insert([
             'order_no' => 0,
             'receipt_no' => 0,
+            'tin_no' => "0000-0000-0000-0000",
         ]);
     }
 }

@@ -16,6 +16,8 @@ class AddTypeToCustomDishesTable extends Migration
         Schema::table('custom_dishes', function (Blueprint $table) {
             //
             $table->enum('type', ['foods', 'drinks'])->after('description');
+            $table->boolean('printed')->default(0)->after('description');
+
         });
     }
 
@@ -29,6 +31,7 @@ class AddTypeToCustomDishesTable extends Migration
         Schema::table('custom_dishes', function (Blueprint $table) {
             //
             $table->dropColumn('type');
+            $table->dropColumn('printed');
         });
     }
 }

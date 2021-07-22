@@ -101,6 +101,7 @@ class Review extends Modal
         $customDishes = [];
         foreach ($this->orderDetails as $item) {
             if (array_key_exists('id', $item)) {
+                $sideDishes = null;
                 if($item['side_id']){
                     $sideDishes = [
                         'side_id' => $item['side_id'],
