@@ -128,7 +128,7 @@ class OrderController extends Controller
 
 
             if(count($drinks) > 0 ){
-                $connector2 = new WindowsPrintConnector("POS-58-Bar");
+                $connector2 = new WindowsPrintConnector("POS-58-BAR");
 
                 $printer2 = new Printer($connector2);
                 $printer2->setJustification(Printer::JUSTIFY_CENTER);
@@ -180,7 +180,7 @@ class OrderController extends Controller
             $totalDiscounted = new receiptItem('Total' , $order->totalPrice());
 
             // Enter the share name for your USB printer here
-            $connector = new WindowsPrintConnector("POS-58");
+            $connector = new WindowsPrintConnector("POS-58-BAR");
 
             /* Print a "Hello world" receipt" */
             $printer = new Printer($connector);
