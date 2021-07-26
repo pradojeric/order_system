@@ -15,6 +15,10 @@ class Dishes extends Component
     public $categories;
     public $pages = 10;
 
+    protected $queryString = [
+        'category' => ['except' => ''],
+    ];
+
     public function mount()
     {
         $this->categories = Category::all();
