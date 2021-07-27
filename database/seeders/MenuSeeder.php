@@ -62,19 +62,19 @@ class MenuSeeder extends Seeder
                 'name' => 'Desserts',
                 'description' => 'Desserts',
                 'type' => 'foods',
-                'icon' => 'icons/Side.png',
+                'icon' => 'icons/Dessert.png',
             ],
             [
                 'name' => 'LCR Classics',
                 'description' => 'LCR Classics',
                 'type' => 'foods',
-                'icon' => 'icons/Side.png',
+                'icon' => 'icons/Classic.png',
             ],
             [
                 'name' => 'Kids Menu',
                 'description' => 'Kids Menu',
                 'type' => 'foods',
-                'icon' => 'icons/Side.png',
+                'icon' => 'icons/Kids.png',
             ],
             [
                 'name' => 'Non-alcoholic',

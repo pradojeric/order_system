@@ -142,11 +142,11 @@ class OrderController extends Controller
                 $printer2->text($date . "\n");
                 $printer2->text("Server: " . $order->waiter->full_name . "\n");
                 $printer2->feed(2);
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
+                $printer2->setJustification(Printer::JUSTIFY_LEFT);
                 foreach ($drinks as $o) {
                     $printer2->text($o->getAsString(52));
                 }
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer2->setJustification(Printer::JUSTIFY_CENTER);
                 $printer2->text('---------------------');
 
                 $printer2->feed(4);
