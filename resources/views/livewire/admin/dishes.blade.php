@@ -1,4 +1,5 @@
 <div x-data="modal()">
+
     <div class="px-4 py-2 w-auto">
         <div class="flex items-center space-x-2">
             <span class="text-xs w-32">
@@ -81,10 +82,10 @@
 
                     @if($dish->status == 1)
                     <a href="#" wire:click.prevent="deactivate({{ $dish }})"
-                        class="text-red-600 hover:text-red-900 ml-3">Remove</a>
+                        class="text-red-600 hover:text-red-900 ml-3">Deactivate</a>
                     @else
-                    <a href="{{ route('admin.dishes.restore', $dish) }}"
-                        class="text-green-600 hover:text-green-900 ml-3">Activate</a>
+                    <a href="#" wire:click.prevent="restore({{ $dish }})"
+                        class="text-green-600 hover:text-green-900 ml-3">Restore</a>
                     @endif
                 </td>
             </tr>

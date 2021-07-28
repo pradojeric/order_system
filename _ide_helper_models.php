@@ -74,6 +74,7 @@ namespace App\Models{
  * @property int $order_id
  * @property string $name
  * @property string $description
+ * @property int $printed
  * @property string $type
  * @property int $pcs
  * @property float $price
@@ -93,6 +94,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish wherePcs($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CustomDish wherePrinted($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|CustomDish withTrashed()
@@ -153,7 +155,7 @@ namespace App\Models{
  * @property float|null $change
  * @property int $enable_discount
  * @property string|null $discount_type
- * @property float $discount
+ * @property float|null $discount
  * @property float|null $tip
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -203,14 +205,15 @@ namespace App\Models{
  *
  * @property int $id
  * @property int $order_id
- * @property int|null $dish_id
+ * @property int $dish_id
+ * @property int $printed
  * @property array|null $side_dishes
  * @property int $pcs
  * @property float $price
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\Dish|null $dish
+ * @property-read \App\Models\Dish $dish
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails drinks()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails newQuery()
@@ -223,6 +226,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePcs($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePrinted($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereSideDishes($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|OrderDetails withTrashed()

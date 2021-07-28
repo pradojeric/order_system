@@ -2,12 +2,13 @@
 
 namespace App\Http\Livewire\Order;
 
-use App\Models\Category;
-use App\Models\CustomDish;
 use App\Models\Dish;
 use App\Models\Order;
-use App\Models\OrderDetails;
 use Livewire\Component;
+use App\Models\Category;
+use App\Models\CustomDish;
+use App\Models\OrderDetails;
+use App\Events\OrderUpdatedEvent;
 
 class Details extends Component
 {
@@ -64,6 +65,7 @@ class Details extends Component
             $item = CustomDish::findOrFail($itemId);
         }
         $item->delete();
+        event(new OrderUpdatedEvent());
         if ($this->order) {
             $order = Order::findOrFail($this->order->id);
             $this->oldOrders = $order->orderDetails;

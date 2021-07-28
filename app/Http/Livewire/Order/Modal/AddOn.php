@@ -33,6 +33,7 @@ class AddOn extends Modal
 
     public function addOn(Dish $dish, $quantity)
     {
+        if (!$dish->status) return;
         $this->toggleModal();
         $this->dish = $dish;
         $this->quantity = $quantity;

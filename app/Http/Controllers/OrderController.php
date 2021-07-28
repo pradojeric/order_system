@@ -175,9 +175,9 @@ class OrderController extends Controller
                 $items[] = new receiptItem($i->name." X ".$i->pcs, $i->price);
             }
 
-            $totalPrice = new receiptItem('Subtotal' , $order->totalPriceWithoutDiscount());
+            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPriceWithoutDiscount(), 2, '.', ','));
             $discount = new receiptItem('Discount' , $order->discount_option);
-            $totalDiscounted = new receiptItem('Total' , $order->totalPrice());
+            $totalDiscounted = new receiptItem('Total' , number_format($order->totalPrice(),2, '.', ','));
 
             // Enter the share name for your USB printer here
             $connector = new WindowsPrintConnector("POS-58-BAR");
@@ -190,7 +190,7 @@ class OrderController extends Controller
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer->text("SABINA\n");
             $printer->selectPrintMode();
-            $printer->text("Bonuan, Dagupan, 2400 Pangasinan");
+            $printer->text('Bonuan, Dagupan, 2400 Pangasinan');
             $printer->setEmphasis(false);
             $printer->feed();
 
@@ -224,7 +224,7 @@ class OrderController extends Controller
                 $printer->text($totalDiscounted->getAsString());
                 $printer->selectPrintMode();
             }
-            $printer->feed(4);
+            $printer->feed(2);
 
             /* Footer */
             $printer->setJustification(Printer::JUSTIFY_CENTER);
@@ -232,10 +232,9 @@ class OrderController extends Controller
             $printer->feed();
             $printer->text("Server: " . $order->waiter->full_name . "\n");
             $printer->text("---------------------");
-            $printer->feed(2);
             $printer->text($date . "\n");
 
-            $printer->feed(4);
+            $printer->feed(3);
 
             $printer->cut();
 

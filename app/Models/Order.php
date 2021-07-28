@@ -84,7 +84,13 @@ class Order extends Model
         $customPrices = $this->customOrderDetails->sum('price');
         $orderPrices = $this->orderDetails->sum('price');
 
-        return $orderPrices + $customPrices;
+        $totalPrice = $orderPrices + $customPrices;
+        return $totalPrice;
+    }
+
+    public function totalDiscountedPrice()
+    {
+        return $this->totalPriceWithoutDiscount() - $this->total;
     }
 
     public function getDiscountOptionAttribute()
@@ -93,12 +99,13 @@ class Order extends Model
         if ($this->enable_discount) {
             if ($this->discount_type == 'percent') {
                 $discount = $this->discount . '%';
+                $discount = number_format($this->totalDiscountedPrice(), 2, '.', ',');
             }
             if ($this->discount_type == 'fixed') {
-                $discount = '₱ ' . number_format($this->discount, 2, '.', ',');
+                $discount = number_format($this->discount, 2, '.', ',');
+                $discount = ' (' . $discount . ')' . number_format($this->totalDiscountedPrice(), 2, '.', ',');
             }
 
-            $discount = '₱ ' . number_format($this->total, 2, '.', ',') . ' (' . $discount . ')';
         } else {
             $discount = '-';
         }

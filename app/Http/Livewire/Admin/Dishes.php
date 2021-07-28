@@ -33,13 +33,14 @@ class Dishes extends Component
     {
         $dish->status = '0';
         $dish->save();
-
+        session()->flash('message', 'Dish successfully deactivated');
     }
 
     public function restore(Dish $dish)
     {
         $dish->status = '1';
         $dish->save();
+        session()->flash('message', 'Dish successfully restored');
 
     }
 

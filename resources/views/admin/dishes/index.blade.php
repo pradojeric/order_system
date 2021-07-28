@@ -10,7 +10,7 @@
             <a type="button" href="{{ route('admin.dishes.create') }}"
                 class="bg-green-500 hover:bg-green-700 py-2 px-3 rounded shadow-sm mb-5 text-white">Add
                 Dish</a>
-            <x-session-message />
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex flex-col">
                     <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
