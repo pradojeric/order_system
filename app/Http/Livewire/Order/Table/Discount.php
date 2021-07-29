@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Order\Table;
 
+use App\Events\AnyOrderUpdatedEvent;
 use App\Events\OrderUpdatedEvent;
 use App\Models\Order;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -11,6 +12,7 @@ class Discount extends Component
 {
     use AuthorizesRequests;
 
+    public $message = '';
     public $enableDiscount;
     public $discountType;
     public $discount;
@@ -25,15 +27,35 @@ class Discount extends Component
         'discount' => 'required_if:enable_discount,true|numeric|min:1'
     ];
 
-    protected $listeners = [
-        'void' => 'void',
-        'echo:updatedOrder,OrderUpdatedEvent' => '$refresh'
-    ];
-
     public function mount()
+    {
+        $this->resetDiscount();
+    }
+
+    public function refreshComponent()
+    {
+        $this->message = "Refreshed";
+    }
+
+    public function getListeners()
+    {
+        $listeners = [
+            'void' => 'void',
+            'echo:newOrder,AnyOrderUpdatedEvent' => 'resetDiscount',
+        ];
+        if($this->order) {
+            $listeners["echo:updatedOrder.{$this->order->id},OrderUpdatedEvent"] = 'resetDiscount';
+        }
+        return $listeners;
+    }
+
+    public function resetDiscount()
     {
         $this->isSaved = false;
         $this->billingType = 'single';
+        $this->enableDiscount = false;
+        $this->discountType = 'percent';
+        $this->discount = 0;
         if ($this->order) {
             $this->enableDiscount = $this->order->enable_discount;
             $this->discountType = $this->order->discount_type;
@@ -54,7 +76,7 @@ class Discount extends Component
             $detail->delete();
         }
         $item->delete();
-        $this->callEvent();
+        event(new AnyOrderUpdatedEvent());
         //
     }
 
@@ -64,6 +86,7 @@ class Discount extends Component
             $this->billingType = "multiple";
             return;
         }
+
         if($this->billingType == "multiple") {
             $this->billingType = "single";
             return;
@@ -74,12 +97,13 @@ class Discount extends Component
     {
         $this->reset('isSaved');
         $this->enableDiscount = !$this->enableDiscount;
+
         if (!$this->enableDiscount) {
             $this->order->update([
                 'enable_discount' => $this->enableDiscount,
             ]);
+            $this->callEvent();
         }
-        $this->callEvent();
     }
 
     public function discountSave()
@@ -99,6 +123,6 @@ class Discount extends Component
 
     public function callEvent()
     {
-        event(new OrderUpdatedEvent());
+        event(new OrderUpdatedEvent($this->order));
     }
 }

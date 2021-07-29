@@ -1,4 +1,5 @@
 <div>
+    {{ $message }}
     <div class="w-full shadow-lg rounded-lg flex flex-col flex-grow h-64 justify-between" x-data>
         <div
             class="flex flex-row items-center justify-between py-2 px-3 {{ $hasOrder ? 'bg-green-800' : 'bg-gray-300' }} rounded-t-lg">
@@ -6,6 +7,11 @@
                 {{ Auth::user()->assignTables->find($table->id)->pivot->table_name ?? $table->name }} ({{ $table->pax }} pax)
             </strong>
             <div class="text-white">
+                @if($hasOrder)
+                <button onclick="event.preventDefault(); print({{ $table->order()->id  }})">
+                    <i class="fa fa-print"></i>
+                </button>
+                @endif
                 <button
                     @click.prevent="window.livewire.emitTo('order.modal.edit-table', 'editTable', {{ $table->id }})">
                     <i class="fa fa-edit"></i>
@@ -87,3 +93,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    function print(id){
+        a = window.open('/print/'+id+'/1', 'myWin', 'left=50, top=50, width=400, height=800');
+        a.screenX = 0;
+        a.screenY = 0;
+        a.document.title = "Print";
+        a.focus();
+        setTimeout(() => {
+            a.close();
+        }, 1000);
+    };
+</script>

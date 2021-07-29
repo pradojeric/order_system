@@ -29,6 +29,12 @@
                         {{-- {{ now()->format('h:i:s a | F d, Y') }} --}}
                         @livewire('clock')
                     </div>
+                    @can('manage')
+
+                    <div class="text-xs underline text-purple-500">
+                        <a href="{{ route('dashboard') }}">{{ __('Go to Dashboard') }}</a>
+                    </div>
+                    @endcan
                 </div>
             </div>
         </div>

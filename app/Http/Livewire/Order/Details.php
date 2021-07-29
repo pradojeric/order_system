@@ -65,11 +65,12 @@ class Details extends Component
             $item = CustomDish::findOrFail($itemId);
         }
         $item->delete();
-        event(new OrderUpdatedEvent());
+
         if ($this->order) {
             $order = Order::findOrFail($this->order->id);
             $this->oldOrders = $order->orderDetails;
             $this->oldCustomOrders = $order->customOrderDetails;
+            event(new OrderUpdatedEvent($this->order));
         }
         //
     }

@@ -102,7 +102,7 @@ class BillingType extends Modal
         $this->order->orderReceipts()->createMany($data);
         $this->order->billing_type = $this->billingType;
         $this->order->save();
-        event(new OrderUpdatedEvent());
+        event(new OrderUpdatedEvent($this->order));
         $this->toggleModal();
     }
 

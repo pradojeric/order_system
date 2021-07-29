@@ -1,9 +1,12 @@
 <div>
     <div>
+        @can('manage')
+            <x-session-message />
+        @endcan
         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5 mt-5">
             @foreach ($tables as $table)
 
-            <livewire:order.table :table="$table" :order="$table->order()" key="table-{{ $table->id }}" />
+                <livewire:order.table :table="$table" :order="$table->order()" key="table-{{ $table->id }}" />
 
             @endforeach
         </div>
@@ -21,7 +24,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5">
                         @foreach ($takeOuts as $order)
 
-                        <livewire:order.other-table :order="$order" action="take_out" key="takeOut-{{ $order->id }}" />
+                            <livewire:order.other-table :order="$order" action="take_out" key="takeOut-{{ $order->id }}" />
 
                         @endforeach
                     </div>
@@ -42,7 +45,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5">
                         @foreach ($deliveries as $order)
 
-                        <livewire:order.other-table :order="$order" action="delivery" key="delivery{{ $order->id }}" />
+                            <livewire:order.other-table :order="$order" action="delivery" key="delivery-{{ $order->id }}" />
 
                         @endforeach
                     </div>

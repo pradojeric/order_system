@@ -28,28 +28,14 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/print/{order}', [OrderController::class, 'printReceipt']);
+Route::get('/print/{order}/{reprint?}', [OrderController::class, 'printReceipt']);
 Route::get('/print-po/{order}', [OrderController::class, 'printPurchasOrder']);
 
 Route::get('/test', function () {
-    $order = Order::latest()->first();
-    $dishes = Dish::all();
+    $pdf = App::make('dompdf.wrapper');
+    $pdf->loadHTML('<h1>Test</h1>');
+    return $pdf->stream();
 
-    $normalOrder = $order->orderDetails->groupBy('dish_id')->map(function ($item) use ($dishes) {
-        $dish_id = $item->first()['dish_id'];
-        return [
-            'dish_name' => $dishes->where('id', $dish_id)->first()->name,
-            'qty' => $item->sum('pcs')
-        ];
-    })->toArray();
-    $customOrder = $order->customOrderDetails->map(function ($item) {
-        return [
-            'dish_name' => $item->name,
-            'qty' => $item->pcs
-        ];
-    })->toArray();
-
-    return array_merge($normalOrder, $customOrder);
 });
 
 

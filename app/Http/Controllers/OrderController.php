@@ -57,14 +57,14 @@ class OrderController extends Controller
         return view('show-order', compact('action', 'table', 'order'));
     }
 
-    public function printReceipt(Order $order)
+    public function printReceipt(Order $order, $reprint = 0)
     {
         try {
             $date = now()->toDateTimeString();
             $foods = [];
             $drinks = [];
             foreach ($order->orderDetails as $i) {
-                if($i->printed) continue;
+                if($i->printed && $reprint == 0) continue;
                 if($i->isDrink()){
                     $drinks[] = new item($i->dish->name, $i->pcs);
                 }else{
@@ -81,7 +81,7 @@ class OrderController extends Controller
             }
 
             foreach ($order->customOrderDetails as $i) {
-                if($i->printed) continue;
+                if($i->printed && $reprint == 0) continue;
                 $itemName = $i->name."\n".$i->description;
                 if($i->isDrink()){
                     $drinks[] = new item($itemName, $i->pcs);

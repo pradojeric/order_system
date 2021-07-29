@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Order;
 use App\Http\Livewire\Modal;
 use App\Models\Configuration;
 use App\Events\OrderUpdatedEvent;
+use App\Events\AnyOrderUpdatedEvent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -151,9 +152,9 @@ class Review extends Modal
 
         $this->config->increment('order_no');
 
-        $this->dispatchBrowserEvent('printOrder', ['orderId' => $this->order->id]);
+        event(new AnyOrderUpdatedEvent());
 
-        event(new OrderUpdatedEvent());
+        $this->dispatchBrowserEvent('printOrder', ['orderId' => $this->order->id]);
 
         // return redirect()->to('/waiter-order');
     }

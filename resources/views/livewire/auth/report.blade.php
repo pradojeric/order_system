@@ -1,9 +1,32 @@
 <div>
     <div x-data="setup()" class="w-full">
-        <div class="flex items-center justify-end mx-6 space-x-3">
-            <button wire:click="prevDate"><i class="fa fa-arrow-left"></i></button>
-            <x-input type="date" class="w-auto text-sm" wire:model="date" />
-            <button wire:click="nextDate"><i class="fa fa-arrow-right"></i></button>
+        <div class="flex justify-between mx-6 py-2">
+            <div class="flex text-xs space-x-3">
+                <span>
+                    {{ __('Report Type') }}
+                </span>
+                <div class="flex space-x-2">
+                    <x-input type="radio" name="dateType" id="single" wire:model.lazy="dateType" value="single" />
+                    <x-label for="single" :value="__('Single')" />
+                </div>
+                <div class="flex space-x-2">
+                    <x-input type="radio" name="dateType" id="range" wire:model.lazy="dateType" value="range" />
+                    <x-label for="range" :value="__('Range')" />
+                </div>
+            </div>
+            <div class="flex space-x-3 items-center">
+                @if($dateType == 'single')
+                    <button wire:click="prevDate"><i class="fa fa-arrow-left"></i></button>
+                    <x-input type="date" class="w-auto text-sm" wire:model="date" />
+                    <button wire:click="nextDate"><i class="fa fa-arrow-right"></i></button>
+                @endif
+                @if($dateType == 'range')
+
+                    <x-input type="date" class="w-auto text-sm" wire:model="date1" />
+                    <span>-</span>
+                    <x-input type="date" class="w-auto text-sm" wire:model="date2" />
+                @endif
+            </div>
         </div>
         <ul class="flex justify-start items-center my-4 mx-6">
             <template x-for="(tab, index) in tabs" :key="index">
@@ -129,9 +152,9 @@
                         @endforeach
                     </tbody>
                 </table>
-                <div class="mx-3">
+                {{-- <div class="mx-3">
                     {{ $dishes->links() }}
-                </div>
+                </div> --}}
             </div>
             <div x-show="activeTab===2">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -165,11 +188,17 @@
                         @endforeach
                     </tbody>
                 </table>
-                <div class="mx-3">
+                {{-- <div class="mx-3">
                     {{ $customDishes->links() }}
-                </div>
+                </div> --}}
             </div>
             <div x-show="activeTab===3">
+                <div class="flex justify-end mx-6 space-x-2">
+                    <span>{{ __('Total') }}</span>
+                    <span>
+                        P {{ number_format($this->total, 2, '.', ',') }}
+                    </span>
+                </div>
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -229,19 +258,19 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function setup() {
-        return {
-          activeTab: 0,
-          tabs: [
-              "Orders",
-              "Dishes",
-              "Custom Dishes",
-              "Waiters",
-          ]
-        };
-      };
-
-    </script>
 </div>
+
+<script>
+    function setup() {
+    return {
+      activeTab: 0,
+      tabs: [
+          "Orders",
+          "Dishes",
+          "Custom Dishes",
+          "Waiters",
+      ]
+    };
+  };
+
+</script>

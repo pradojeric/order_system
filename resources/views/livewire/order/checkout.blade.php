@@ -98,6 +98,40 @@
                         </div>
                         @endif
                         <!-- End Enable Discount -->
+
+                        <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
+                            <span>
+                                Payment Type:
+                            </span>
+                            <div class="flex space-x-2">
+                                <div class="flex">
+                                    <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="cash" value="cash" />
+                                    <x-label for="cash" :value="__('Cash')" />
+                                </div>
+                                <div class="flex">
+                                    <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="check" value="check" />
+                                    <x-label for="check" :value="__('Check')" />
+                                </div>
+                            </div>
+                        </div>
+
+                        @if($paymentType == 'check')
+                        <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
+                            <span>
+                                Ref Number:
+                            </span>
+                            <div class="flex flex-col">
+                                <x-input class="text-right h-8" wire:model="refNo"
+                                    type="text" />
+                                @error('refNo')
+                                <span class="text-xs text-red-500 text-right">
+                                    {{ $message }}
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
                             <span>
                                 Cash:
@@ -112,6 +146,7 @@
                                 @enderror
                             </div>
                         </div>
+
                         <div class="text-sm font-bold flex flex-row justify-between mb-2">
                             <span>
                                 Change:
@@ -138,6 +173,7 @@
     </div>
     @endif
 </div>
+
 <script>
     window.addEventListener('printPO', event => {
         var button = document.getElementById('cOut');

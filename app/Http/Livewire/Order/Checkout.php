@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Order;
 
+use App\Events\AnyOrderUpdatedEvent;
 use App\Models\Order;
 use App\Models\Table;
 use Livewire\Component;
@@ -19,6 +20,8 @@ class Checkout extends Modal
     public $totalPrice;
     public $cash;
     public $change;
+    public $paymentType;
+    public $refNo;
     public $enableDiscount;
     public $discount;
     public $discountType;
@@ -38,9 +41,6 @@ class Checkout extends Modal
     public function checkOut(Order $order)
     {
         $this->toggleModal();
-        //$this->orderDetails = $order->orderDetails;
-
-        // dd($order->orderDetails);
         foreach ($order->orderDetails as $item) {
 
             $this->orderDetails[] = [
@@ -67,6 +67,8 @@ class Checkout extends Modal
         $this->order = $order;
         $this->orderNumber = $order->order_number;
         $this->receiptName = '';
+        $this->paymentType = 'cash';
+        $this->refNo = null;
     }
 
     public function close()
@@ -81,14 +83,27 @@ class Checkout extends Modal
         (float)$this->change = (float)$this->cash - (float)$this->totalPrice;
     }
 
+    public function updatingRefNo($value)
+    {
+        $this->resetErrorBag('refNo');
+    }
+
     public function confirmCheckOut()
     {
         if ($this->totalPrice > $this->cash) {
             $this->addError('cash', 'You do not have enough cash');
             return;
         }
-        if (count($this->order->tables) > 0) {
 
+        if($this->paymentType == 'check')
+        {
+            if($this->refNo == '') {
+                $this->addError('refNo', 'Reference Number is required');
+                return;
+            }
+        }
+
+        if (count($this->order->tables) > 0) {
             $this->order->tables()->detach();
         }
 
@@ -98,6 +113,7 @@ class Checkout extends Modal
             'cash' => $this->cash,
             'change' => $this->change,
             'tip' => $this->config->tip,
+            'ref_no' => $this->paymentType == 'check' ? $this->refNo : null,
         ]);
 
         $receipts = $this->order->orderReceipts;
@@ -125,7 +141,7 @@ class Checkout extends Modal
         }
         $this->dispatchBrowserEvent('printPO', ['orderId' => $this->order->id]);
 
-        event(new OrderUpdatedEvent());
+        event(new AnyOrderUpdatedEvent());
         $this->close();
     }
 

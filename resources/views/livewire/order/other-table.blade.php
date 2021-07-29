@@ -1,5 +1,10 @@
 <div>
     <div class="border border-gray-300 rounded-lg p-1 flex flex-col h-64 justify-between flex-grow" x-data>
+        <div class="px-1 text-right">
+            <button onclick="event.preventDefault(); print({{ $order->id  }})">
+                <i class="fa fa-print"></i>
+            </button>
+        </div>
         <div class="flex">
             <div class="w-64 p-2 h-48">
                 @if($order)
@@ -75,3 +80,16 @@
     </div>
 
 </div>
+
+<script>
+    function print(id){
+        a = window.open('/print/'+id+'/1', 'myWin', 'left=50, top=50, width=400, height=800');
+        a.screenX = 0;
+        a.screenY = 0;
+        a.document.title = "Print";
+        a.focus();
+        setTimeout(() => {
+            a.close();
+        }, 1000);
+    };
+</script>

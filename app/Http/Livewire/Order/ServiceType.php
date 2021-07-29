@@ -9,9 +9,16 @@ use Illuminate\Support\Facades\Auth;
 
 class ServiceType extends Component
 {
+    public $message = '';
+
     protected $listeners = [
-        'echo:updatedOrder,OrderUpdatedEvent' => '$refresh'
+        'echo:newOrder,AnyOrderUpdatedEvent' => '$refresh',
     ];
+
+    public function refreshComponent()
+    {
+        session()->flash('message', 'Page updated. Please refresh the page!');
+    }
 
     public function render()
     {
