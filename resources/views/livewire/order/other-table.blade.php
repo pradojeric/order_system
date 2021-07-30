@@ -12,7 +12,12 @@
                     <a href="{{ route('orders.show', ['action' => $action, 'order' => $order]) }}">
                         <ul class="list-unstyled text-xs">
                             <li>Order # {{ $order->order_number }}</li>
-                            <li>Amount: ₱ {{number_format( $order->totalPrice(), 2, '.', ',') }}</li>
+                            <li>
+                                Amount: ₱ {{number_format( $order->totalPrice(), 2, '.', ',') }}
+                                <span class="line-through">
+                                    {{ $order->enable_discount ? number_format( $order->totalPriceWithoutDiscount(), 2, '.', ',') : '' }}
+                                </span>
+                            </li>
                             @if($order->action == "Delivery")
                             <li>Address: {{ $order->address }}</li>
                             <li>Contact: {{ $order->contact }}</li>
@@ -25,19 +30,20 @@
                 </div>
 
                 @can('manage')
-                <div class="flex flex-row mt-1 items-center space-x-2">
-                    <button
-                        class="text-xs py-1 px-2 rounded-md text-white {{  !$enableDiscount ? 'bg-green-500 hover:bg-green-700' : 'bg-red-500 hover:bg-red-700' }}"
-                        wire:click="activateDiscount">{{ !$enableDiscount ? 'Enable Discount' : 'Disable'}}</button>
-                    @if ($enableDiscount)
+                    <livewire:order.modal.discount :order="$order" key="discount-{{ $order }}" />
+                    <div class="flex flex-row mt-2 items-center space-x-2">
+                        <button
+                            class="text-xs py-1 px-2 rounded-md text-white bg-green-500"
+                            wire:click="$emitTo('order.modal.discount', '{{ "openDiscount.{$order->id}" }}' )">{{ __('Discount') }}</button>
+                    {{-- @if ($enableDiscount)
                     <button class="text-xs py-1 px-2 rounded-md text-white bg-green-500 hover:bg-green-700"
                         wire:click="discountSave">Save</button>
                     @endif
                     @if($isSaved)
                     <i class="fa fa-check text-green-500"></i>
-                    @endif
+                    @endif --}}
                 </div>
-                @if($enableDiscount)
+                {{-- @if($enableDiscount)
                 <div class="flex flex-col mt-1 space-y-1">
                     <x-select class="h-8 text-xs" wire:model="discountType">
                         <option value="percent">{{ _('Percent') }}</option>
@@ -47,7 +53,7 @@
                         class="text-right text-xs p-2 {{ $errors->get('discount') ? 'border border-red-500' : '' }}"
                         wire:model="discount" />
                 </div>
-                @endif
+                @endif --}}
                 @endcan
 
                 @else
@@ -78,7 +84,7 @@
 
         </div>
     </div>
-
+    <livewire:order.modal.discount key="discount-{{ $order->id }}" />
 </div>
 
 <script>

@@ -49,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+    Route::get('/waiter-dashboard', [waiterController::class, 'dashboard'])->name('waiter.dashboard');
 
     Route::get('/orders/create/{action}/{tableId?}', [OrderController::class, 'create'])->name('orders.create');
     Route::get('/orders/show/{action}/{order}/{tableId?}', [OrderController::class, 'show'])->name('orders.show');

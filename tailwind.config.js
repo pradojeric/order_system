@@ -13,6 +13,9 @@ module.exports = {
                 sans: ['Nunito', ...defaultTheme.fontFamily.sans],
             },
         },
+        fontSize: {
+            '2xs': '.6rem',
+          }
     },
 
     variants: {

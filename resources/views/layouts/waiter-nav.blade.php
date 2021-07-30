@@ -30,10 +30,14 @@
                         @livewire('clock')
                     </div>
                     @can('manage')
-
-                    <div class="text-xs underline text-purple-500">
-                        <a href="{{ route('dashboard') }}">{{ __('Go to Dashboard') }}</a>
-                    </div>
+                        <div class="text-xs underline text-purple-500">
+                            <a href="{{ route('dashboard') }}">{{ __('Go to Dashboard') }}</a>
+                        </div>
+                    @endcan
+                    @can('waiter')
+                        <div class="text-xs underline text-purple-500">
+                            <a href="{{ route('waiter.dashboard') }}">{{ __('Go to Dashboard') }}</a>
+                        </div>
                     @endcan
                 </div>
             </div>

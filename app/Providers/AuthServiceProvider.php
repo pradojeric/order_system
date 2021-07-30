@@ -36,6 +36,10 @@ class AuthServiceProvider extends ServiceProvider
             return $user->role->id == 1 || $user->role->id == 2;
         });
 
+        Gate::define('waiter', function(User $user){
+            return $user->role->id == 3;
+        });
+
         Gate::define('waiter-order', function (User $user, Order $order) {
             return $user->id == $order->waiter->id;
         });

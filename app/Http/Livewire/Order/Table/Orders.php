@@ -8,7 +8,7 @@ use App\Models\Order;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 
-class Discount extends Component
+class Orders extends Component
 {
     use AuthorizesRequests;
 
@@ -24,7 +24,7 @@ class Discount extends Component
     protected $rules = [
         'enableDiscount' => 'nullable',
         'discountType' => 'nullable|required_if:enable_discount,true|in:percent,fixed',
-        'discount' => 'required_if:enable_discount,true|numeric|min:1'
+        'discount' => 'required_if:enable_discount,true|numeric|min:1',
     ];
 
     public function mount()
@@ -32,19 +32,14 @@ class Discount extends Component
         $this->resetDiscount();
     }
 
-    public function refreshComponent()
-    {
-        $this->message = "Refreshed";
-    }
-
     public function getListeners()
     {
         $listeners = [
-            'void' => 'void',
             'echo:newOrder,AnyOrderUpdatedEvent' => 'resetDiscount',
         ];
         if($this->order) {
             $listeners["echo:updatedOrder.{$this->order->id},OrderUpdatedEvent"] = 'resetDiscount';
+            $listeners['void'] = 'void';
         }
         return $listeners;
     }

@@ -153,6 +153,7 @@ namespace App\Models{
  * @property float|null $total
  * @property float|null $cash
  * @property float|null $change
+ * @property string|null $ref_no
  * @property int $enable_discount
  * @property string|null $discount_type
  * @property float|null $discount
@@ -189,6 +190,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereOrderNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order wherePax($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereRefNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereTip($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)

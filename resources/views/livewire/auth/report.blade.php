@@ -49,7 +49,20 @@
                 <label for="delivery">{{ __('Delivery') }}</label>
             </div>
             <div x-show="activeTab===0" class="overflow-x-auto">
-
+                <div class="flex justify-end mx-6 space-x-2 text-xs">
+                    <span class="font-semibold">{{ __('Cash:') }}</span>
+                    <span>
+                        P {{ number_format($this->cash, 2, '.', ',') }}
+                    </span>
+                    <span class="font-semibold">{{ __('Credit Card:') }}</span>
+                    <span>
+                        P {{ number_format($this->creditCard, 2, '.', ',') }}
+                    </span>
+                    <span class="font-bold">{{ __('Total:') }}</span>
+                    <span>
+                        P {{ number_format($this->total, 2, '.', ',') }}
+                    </span>
+                </div>
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -82,14 +95,18 @@
                             </th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Credit Card
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Change
                             </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($orders as $order)
+                        @forelse($orders as $order)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                                 {{ $order->order_number }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-900">
@@ -99,27 +116,56 @@
                                     @endforeach
                                 </ul>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                                 {{ $order->pax }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                                 {{ $order->action }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                                 {{ $order->waiter->full_name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm"> ₱
-                                {{ number_format($order->totalPriceWithoutDiscount(), 2, '.', ',') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                {{ '₱ '. number_format($order->totalPriceWithoutDiscount(), 2, '.', ',') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $order->discount_option }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱
-                                {{ number_format($order->cash, 2, '.', ',') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱
-                                {{ number_format($order->change, 2, '.', ',') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ '₱ '. number_format($order->cash, 2, '.', ',') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                                {{ $order->ref_no }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ₱ {{ number_format($order->change, 2, '.', ',') }}
+                            </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="9" class="text-center text-sm text-red-500 py-4">No records</td>
+                        </tr>
+
+                        @endforelse
                     </tbody>
+                    @if($orders->count() > 0)
+                    <tfoot>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td class="text-center text-md text-gray-500 py-4">Subtotal</td>
+                            <td colspan="2" class="text-right text-md text-gray-500 py-4 px-6">
+                                <span>
+
+                                    {{ "P ". number_format($orders->sum('total'), 2, '.',',') }}
+                                </span>
+                                <span class="font-bold">
+
+                                    ({{ "P ". number_format($total, 2, '.',',') }})
+                                </span>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                    @endif
                 </table>
                 <div class="mx-3">
                     {{ $orders->links() }}
@@ -193,12 +239,6 @@
                 </div> --}}
             </div>
             <div x-show="activeTab===3">
-                <div class="flex justify-end mx-6 space-x-2">
-                    <span>{{ __('Total') }}</span>
-                    <span>
-                        P {{ number_format($this->total, 2, '.', ',') }}
-                    </span>
-                </div>
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>

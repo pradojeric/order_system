@@ -2,9 +2,10 @@
 
 namespace App\Http\Livewire\Order;
 
-use App\Http\Livewire\Order\Table\Discount;
 
-class OtherTable extends Discount
+use App\Http\Livewire\Order\Table\Orders;
+
+class OtherTable extends Orders
 {
 
     public function render()

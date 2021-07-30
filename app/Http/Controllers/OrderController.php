@@ -231,7 +231,7 @@ class OrderController extends Controller
             $printer->text("This is not the official receipt\n");
             $printer->feed();
             $printer->text("Server: " . $order->waiter->full_name . "\n");
-            $printer->text("---------------------");
+            $printer->text("-----------------------\n");
             $printer->text($date . "\n");
 
             $printer->feed(3);
@@ -265,7 +265,7 @@ class item
     {
         $rightCols = 10;
         $leftCols = $width - $rightCols;
-        $left = str_pad($this->name, $leftCols);
+        $left = str_pad($this->name ." ".$this->description, $leftCols);
         $right = str_pad("X " . $this->quantity, $rightCols, ' ', STR_PAD_LEFT);
         return "$left$right\n";
     }

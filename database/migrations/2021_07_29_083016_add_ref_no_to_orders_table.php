@@ -15,6 +15,7 @@ class AddRefNoToOrdersTable extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->string('ref_no')->nullable()->after('change');
+            $table->string('discount_ref')->nullable()->after('discount');
         });
     }
 
@@ -28,6 +29,7 @@ class AddRefNoToOrdersTable extends Migration
         Schema::table('orders', function (Blueprint $table) {
             //
             $table->dropColumn('ref_no');
+            $table->string('discount_ref')->nullable()->after('discount');
         });
     }
 }

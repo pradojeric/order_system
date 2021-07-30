@@ -20,7 +20,11 @@ class Report extends Component
     public $date1;
     public $date2;
     public $action;
+
+    public $cash;
+    public $creditCard;
     public $total;
+
     public $paginate = 15;
 
     public function mount()
@@ -37,6 +41,7 @@ class Report extends Component
         $date = Carbon::parse($this->date);
         $date->addDay();
         $this->date = $date->toDateString();
+        $this->resetPage();
     }
 
     public function prevDate()
@@ -44,6 +49,7 @@ class Report extends Component
         $date = Carbon::parse($this->date);
         $date->subDay();
         $this->date = $date->toDateString();
+        $this->resetPage();
     }
 
     public function render()
@@ -57,6 +63,8 @@ class Report extends Component
             });
 
         $this->total = $orders->sum('total');
+        $this->cash = (clone $orders)->whereNull('ref_no')->sum('total');
+        $this->creditCard = (clone $orders)->whereNotNull('ref_no')->sum('total');
 
         $orders = $orders->when($this->action != 'all', function ($query) {
                     $query->where('action', $this->action);

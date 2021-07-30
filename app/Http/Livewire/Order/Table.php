@@ -2,10 +2,10 @@
 
 namespace App\Http\Livewire\Order;
 
-use App\Http\Livewire\Order\Table\Discount;
-use App\Models\Order;
+use App\Http\Livewire\Order\Table\Orders;
 
-class Table extends Discount
+
+class Table extends Orders
 {
 
     public $table;
