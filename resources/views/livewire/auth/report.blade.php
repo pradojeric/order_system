@@ -101,6 +101,9 @@
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Change
                             </th>
+                            <th scope="col" class="relative px-6 py-3">
+                                <span class="sr-only">Action</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -138,6 +141,11 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 ₱ {{ number_format($order->change, 2, '.', ',') }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <button onclick="event.preventDefault(); print({{ $order->id }})">
+                                    <i class="fa fa-print"></i>
+                                </button>
                             </td>
                         </tr>
                         @empty
@@ -301,16 +309,28 @@
 </div>
 
 <script>
+    function print(id) {
+
+        a = window.open('/print-po/'+id, 'myWin', 'left=50, top=50, width=400, height=800');
+        a.screenX = 0;
+        a.screenY = 0;
+        a.document.title = "Print";
+        a.focus();
+        setTimeout(() => {
+            a.close();
+        }, 1000);
+    }
+
     function setup() {
-    return {
-      activeTab: 0,
-      tabs: [
-          "Orders",
-          "Dishes",
-          "Custom Dishes",
-          "Waiters",
-      ]
+        return {
+        activeTab: 0,
+        tabs: [
+            "Orders",
+            "Dishes",
+            "Custom Dishes",
+            "Waiters",
+        ]
+        };
     };
-  };
 
 </script>

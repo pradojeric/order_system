@@ -68,13 +68,10 @@ class OrderController extends Controller
                 if($i->isDrink()){
                     $drinks[] = new item($i->dish->name, $i->pcs);
                 }else{
-                    if($i->side_dishes)
-                    {
-                        $dishName = $i->dish->name."\n".$i->side_dishes['side_name'];
-                    }else{
-                        $dishName = $i->dish->name;
-                    }
-                    $foods[] = new item($dishName, $i->pcs);
+                    $dishName = $i->dish->name;
+                    $description = $i->side_dishes ?  "side: ".$i->side_dishes['side_name'] : null;
+
+                    $foods[] = new item($dishName, $i->pcs, $description);
                 }
                 $i->printed = true;
                 $i->save();
@@ -82,15 +79,18 @@ class OrderController extends Controller
 
             foreach ($order->customOrderDetails as $i) {
                 if($i->printed && $reprint == 0) continue;
-                $itemName = $i->name."\n".$i->description;
+                $itemName = $i->name;
+
                 if($i->isDrink()){
-                    $drinks[] = new item($itemName, $i->pcs);
+                    $drinks[] = new item($itemName, $i->pcs, $i->description);
                 }else{
-                    $foods[] = new item($itemName, $i->pcs);
+                    $foods[] = new item($itemName, $i->pcs, $i->description);
                 }
                 $i->printed = true;
                 $i->save();
             }
+
+            $length = 60;
 
             if(count($foods) > 0) {
 
@@ -112,8 +112,9 @@ class OrderController extends Controller
                 $printer->text("Server: " . $order->waiter->full_name . "\n");
                 $printer->feed(2);
                 $printer->setJustification(Printer::JUSTIFY_LEFT);
+
                 foreach ($foods as $o) {
-                    $printer->text($o->getAsString(52));
+                    $printer->text($o->getAsString($length));
                 }
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text('---------------------');
@@ -144,7 +145,7 @@ class OrderController extends Controller
                 $printer2->feed(2);
                 $printer2->setJustification(Printer::JUSTIFY_LEFT);
                 foreach ($drinks as $o) {
-                    $printer2->text($o->getAsString(52));
+                    $printer2->text($o->getAsString($length));
                 }
                 $printer2->setJustification(Printer::JUSTIFY_CENTER);
                 $printer2->text('---------------------');
@@ -168,13 +169,15 @@ class OrderController extends Controller
             $date = now()->toDateTimeString();
             $items = [];
             foreach ($order->orderDetails as $i) {
-                $items[] = new receiptItem($i->dish->name." X ".$i->pcs, $i->price);
+                $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
             }
 
             foreach ($order->customOrderDetails as $i) {
-                $items[] = new receiptItem($i->name." X ".$i->pcs, $i->price);
+                $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
             }
 
+            $cash = new receiptItem('Cash', number_format($order->cash, 2, '.', ','));
+            $change = new receiptItem('Change', number_format($order->change, 2, '.', ','));
             $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPriceWithoutDiscount(), 2, '.', ','));
             $discount = new receiptItem('Discount' , $order->discount_option);
             $totalDiscounted = new receiptItem('Total' , number_format($order->totalPrice(),2, '.', ','));
@@ -195,6 +198,7 @@ class OrderController extends Controller
             $printer->feed();
 
             /* Title of receipt */
+            $length = 60;
             $printer->setEmphasis(true);
             $printer->text("PURCHASE ORDER\n");
             $printer->setEmphasis(false);
@@ -205,25 +209,23 @@ class OrderController extends Controller
 
             /* Items */
             foreach ($items as $o) {
-                $printer->text($o->getAsString());
+                $printer->text($o->getAsString($length));
             }
             $printer->feed();
 
             /* Tax and total */
+
             if($order->enable_discount)
             {
-                $printer->text($totalPrice->getAsString());
-                $printer->text($discount->getAsString());
-                $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-                $printer->text($totalDiscounted->getAsString());
-                $printer->selectPrintMode();
+                $printer->text($totalPrice->getAsString($length));
+                $printer->text($discount->getAsString($length));
             }
-            else
-            {
-                $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-                $printer->text($totalDiscounted->getAsString());
-                $printer->selectPrintMode();
-            }
+            $printer->text($cash->getAsString($length));
+            $printer->text($change->getAsString($length));
+            $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+            $printer->text($totalDiscounted->getAsString());
+            $printer->selectPrintMode();
+
             $printer->feed(2);
 
             /* Footer */
@@ -263,11 +265,23 @@ class item
 
     public function getAsString($width = 48)
     {
-        $rightCols = 10;
-        $leftCols = $width - $rightCols;
-        $left = str_pad($this->name ." ".$this->description, $leftCols);
-        $right = str_pad("X " . $this->quantity, $rightCols, ' ', STR_PAD_LEFT);
-        return "$left$right\n";
+        // $rightCols = 10;
+        // $leftCols = $width - $rightCols;
+        // if($this->description != '')
+        // {
+        //     $left = str_pad($this->name."\n   ".$this->description, $width);
+        //     $rightCols *= 2;
+        // }
+        // else
+        // {
+        //     $left = str_pad($this->name , $leftCols);
+        // }
+        // $right = str_pad("X " . $this->quantity, $rightCols, ' ', STR_PAD_LEFT);
+        // return "$left$right\n";
+        $left = $this->quantity . " X  ".$this->name;
+        if($this->description != null)
+            $left .= "\n    ".$this->description;
+        return "$left\n";
     }
 
     public function __toString()
@@ -289,7 +303,7 @@ class receiptItem
         $this->pesoSign = $pesoSign;
     }
 
-    public function getAsString($width = 48)
+    public function getAsString($width = 30)
     {
         $rightCols = 10;
         $leftCols = $width - $rightCols;
