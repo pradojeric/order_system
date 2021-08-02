@@ -28,6 +28,7 @@ class Checkout extends Modal
     public $config;
     public $receiptName;
 
+
     protected $listeners = [
         'checkOut' => 'checkOut',
         'close' => 'close',
@@ -37,6 +38,7 @@ class Checkout extends Modal
     {
         $this->config = Configuration::first();
     }
+
 
     public function checkOut(Order $order)
     {
@@ -79,6 +81,12 @@ class Checkout extends Modal
 
     public function computeChange()
     {
+        if(strlen($this->cash) >= 10)
+        {
+            $this->addError('cash', 'Max length exceeded. Maximum: 10 digits');
+            return;
+        }
+
         $this->resetErrorBag();
         (float)$this->change = (float)$this->cash - (float)$this->totalPrice;
     }
@@ -88,8 +96,15 @@ class Checkout extends Modal
         $this->resetErrorBag('refNo');
     }
 
+
     public function confirmCheckOut()
     {
+        if(strlen($this->cash) >= 10)
+        {
+            $this->addError('cash', 'Max length exceeded. Maximum: 10 digits');
+            return;
+        }
+
         if ($this->totalPrice > $this->cash) {
             $this->addError('cash', 'You do not have enough cash');
             return;

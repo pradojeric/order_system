@@ -220,11 +220,12 @@ class OrderController extends Controller
                 $printer->text($totalPrice->getAsString($length));
                 $printer->text($discount->getAsString($length));
             }
-            $printer->text($cash->getAsString($length));
-            $printer->text($change->getAsString($length));
+
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer->text($totalDiscounted->getAsString());
             $printer->selectPrintMode();
+            $printer->text($cash->getAsString($length));
+            $printer->text($change->getAsString($length));
 
             $printer->feed(2);
 

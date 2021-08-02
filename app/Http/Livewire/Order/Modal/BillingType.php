@@ -14,13 +14,14 @@ class BillingType extends Modal
     public $remaining;
     public $isBillEqualPrice;
     public Order $order;
+
     public $receipts = [ [] ];
 
     protected $rules = [
         'receipts.*.name' => 'required',
         'receipts.*.address' => 'required',
         'receipts.*.contact' => 'required',
-        'receipts.*.amount' => 'numeric',
+        'receipts.*.amount' => 'nullable|numeric',
     ];
 
     protected $messages = [
@@ -33,12 +34,13 @@ class BillingType extends Modal
     public function setBillingType()
     {
         $this->toggleModal();
-        if($this->order->orderReceipts->count() > 0){
+        if($this->order->orderReceipts->count() > 0)
+        {
 
-            $amount = $this->order->totalPrice() / $this->order->orderReceipts->count();
-            $this->receipts = $this->order->orderReceipts->each(function($r) use ($amount){
-                $r['amount'] = $amount;
+            $this->receipts = $this->order->orderReceipts->each(function($r) {
+                $r['amount'] = '';
             })->toArray();
+
             $this->totalSegmentBill = $this->order->totalPrice();
             $this->remaining = $this->order->totalPrice() - $this->totalSegmentBill;
             $this->isBillEqualPrice = $this->remaining == 0;
@@ -54,6 +56,7 @@ class BillingType extends Modal
                 if($i > 0) unset($this->receipts[$i]);
             }
         }
+
         if($value == "multiple")
         {
             $this->addReceipient();
@@ -66,16 +69,20 @@ class BillingType extends Modal
         $total = 0;
         foreach($this->receipts as $a)
         {
-            $total += (int)$a['amount'] ?? 0;
+            $amount = $a['amount'] ?? 0;
+            $total += (int)$amount;
         }
+
         $this->totalSegmentBill = $total;
         $this->remaining = $this->order->totalPrice() - $this->totalSegmentBill;
-        $this->isBillEqualPrice = $this->remaining == 0;
+        $this->isBillEqualPrice = $this->remaining == 0 || $total == 0;
     }
 
     public function addReceipient()
     {
-        $this->receipts[] = [];
+        $this->receipts[] = [
+            'amount' => '',
+        ];
     }
 
     public function saveReceipts()
@@ -90,11 +97,16 @@ class BillingType extends Modal
         $data = [];
         foreach($this->receipts as $receipt)
         {
+            if($receipt['amount'] == '')
+            {
+                $receipt['amount'] = $this->order->totalPrice() / count($this->receipts);
+            }
+
             $data[] = [
                 'name' => $receipt['name'],
                 'address' => $receipt['address'],
                 'contact' => $receipt['contact'],
-                'amount' => $receipt['amount'] ?? null,
+                'amount' => $receipt['amount'],
             ];
         }
 

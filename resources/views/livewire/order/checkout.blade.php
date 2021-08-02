@@ -137,7 +137,7 @@
                                 Cash:
                             </span>
                             <div class="flex flex-col">
-                                <x-input class="text-right h-8" wire:model.defer="cash" wire:keyup="computeChange"
+                                <x-input class="text-right h-8" wire:model.number="cash" wire:keyup="computeChange" id="cash"
                                     type="number" />
                                 @error('cash')
                                 <span class="text-xs text-red-500 text-right">
