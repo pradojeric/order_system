@@ -80,7 +80,6 @@ class Review extends Modal
 
     public function createOrder()
     {
-
         if ($this->action === 'Delivery') {
             if ($this->address === '' || empty($this->address)) {
                 $this->addError('address', 'You must enter address');
@@ -100,6 +99,7 @@ class Review extends Modal
 
         $orderDetails = [];
         $customDishes = [];
+
         foreach ($this->orderDetails as $item) {
             if (array_key_exists('id', $item)) {
                 $sideDishes = null;
@@ -114,6 +114,7 @@ class Review extends Modal
                     'dish_id' => $item['id'],
                     'pcs' => $item['quantity'],
                     'price' => $item['price'],
+                    'price_per_piece' => $item['price_per_piece'],
                     'side_dishes' => $sideDishes ?? null,
                 ];
             } else {
@@ -122,12 +123,15 @@ class Review extends Modal
                     'pcs' => $item['quantity'],
                     'description' => $item['desc'],
                     'price' => $item['price'],
+                    'price_per_piece' => $item['price_per_piece'],
                     'type' => $item['type'],
                 ];
             }
         }
 
-        if (!$this->order) {
+
+        if ($this->order->attributes == null) {
+
             $this->order = Auth::user()->orders()->create([
                 'order_number' => $this->config->order_no,
                 'pax' => $this->pax,
@@ -142,7 +146,10 @@ class Review extends Modal
             $this->order->update([
                 'pax' => $this->pax,
             ]);
+
         }
+
+
 
         $this->order->orderDetails()->createMany($orderDetails);
 

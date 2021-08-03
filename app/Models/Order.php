@@ -31,6 +31,11 @@ class Order extends Model
         return $this->hasMany(OrderReceipt::class);
     }
 
+    public function cancel()
+    {
+        return $this->morphMany(Cancel::class, 'cancellable');
+    }
+
     public function orderDishes()
     {
         $orders = $this->orderDetails->groupBy('dish_id');
@@ -61,10 +66,7 @@ class Order extends Model
 
     public function totalPrice()
     {
-        $customPrices = $this->customOrderDetails->sum('price');
-        $orderPrices = $this->orderDetails->sum('price');
-
-        $total =  $customPrices + $orderPrices;
+        $total =  $this->totalPriceWithoutDiscount();
 
         if ($this->enable_discount == true) {
             if ($this->discount_type === 'percent') {
@@ -79,18 +81,30 @@ class Order extends Model
         return $total;
     }
 
+    public function totalPriceWithServiceCharge()
+    {
+        return $this->totalPrice() + $this->serviceCharge();
+    }
+
     public function totalPriceWithoutDiscount()
     {
         $customPrices = $this->customOrderDetails->sum('price');
         $orderPrices = $this->orderDetails->sum('price');
 
         $totalPrice = $orderPrices + $customPrices;
+
         return $totalPrice;
     }
 
     public function totalDiscountedPrice()
     {
-        return $this->totalPriceWithoutDiscount() - $this->total;
+        return $this->totalPriceWithoutDiscount() - $this->totalPrice();
+    }
+
+    public function serviceCharge()
+    {
+        $config = Configuration::first();
+        return $this->totalPrice() * ($config->tip / 100);
     }
 
     public function getDiscountOptionAttribute()

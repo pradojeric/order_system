@@ -85,7 +85,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'Alcoholic',
                 'description' => 'Alcoholic',
-                'type' => 'drinks',
+                'type' => 'alcoholic',
                 'icon' => 'icons/Alcoholic.png',
             ],
         ];

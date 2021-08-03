@@ -4,17 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderDetails extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $guarded = [];
 
     protected $casts = [
         'side_dishes' => 'array'
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function cancel()
+    {
+        return $this->morphMany(Cancel::class, 'cancellable');
+    }
 
     public function dish()
     {
@@ -32,6 +41,11 @@ class OrderDetails extends Model
 
     public function isDrink()
     {
-        return $this->dish->category->type == "drinks";
+        return $this->dish->category->type == "alcoholic";
+    }
+
+    public function isFood()
+    {
+        return $this->dish->category->type == "foods";
     }
 }

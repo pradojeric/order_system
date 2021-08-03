@@ -2,14 +2,15 @@
 
 namespace App\Http\Livewire\Order;
 
-use App\Events\AnyOrderUpdatedEvent;
 use App\Models\Order;
 use App\Models\Table;
 use Livewire\Component;
 use App\Http\Livewire\Modal;
+use App\Models\OrderReceipt;
 use App\Models\Configuration;
 use App\Events\OrderUpdatedEvent;
-use App\Models\OrderReceipt;
+use App\Events\AnyOrderUpdatedEvent;
+use Illuminate\Support\Facades\Auth;
 
 class Checkout extends Modal
 {
@@ -17,17 +18,22 @@ class Checkout extends Modal
     public $orderNumber;
     public $receiptNumber;
     public $order;
+
+    public $subTotal;
+    public $serviceCharge;
     public $totalPrice;
+
     public $cash;
     public $change;
     public $paymentType;
     public $refNo;
+
     public $enableDiscount;
     public $discount;
     public $discountType;
+
     public $config;
     public $receiptName;
-
 
     protected $listeners = [
         'checkOut' => 'checkOut',
@@ -53,6 +59,7 @@ class Checkout extends Modal
             ];
         }
         foreach ($order->customOrderDetails as $item) {
+
             $this->orderDetails[] = [
                 'name' => $item->name,
                 'quantity' => $item->pcs,
@@ -61,10 +68,14 @@ class Checkout extends Modal
         }
 
         $this->enableDiscount = $order->enable_discount;
-        $this->discount = $order->discount;
+        $this->discount = $order->discount_option;
         $this->discountType = $order->discount_type;
 
-        $this->totalPrice = $order->totalPrice();
+        $this->subTotal = $order->totalPriceWithoutDiscount();
+
+        $this->serviceCharge = $order->totalPrice() * ($this->config->tip / 100);
+        $this->totalPrice = $order->totalPrice() + $this->serviceCharge;
+
         $this->table = $order->table() ?? '';
         $this->order = $order;
         $this->orderNumber = $order->order_number;
@@ -123,6 +134,7 @@ class Checkout extends Modal
         }
 
         $this->order->update([
+            'waiter_id' => Auth::id(),
             'checked_out' => true,
             'total' => $this->totalPrice,
             'cash' => $this->cash,

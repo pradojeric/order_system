@@ -25,12 +25,15 @@ class Details extends Component
     public $order;
     public $isReviewing;
 
-    protected $listeners = [
-        'addToDish' => 'addCustomDish',
-        'void' => 'void',
-        'addSideDish' => 'addDish',
-        'cancelReview' => 'setReview',
-    ];
+    public function getListeners()
+    {
+        return [
+            'addToDish' => 'addCustomDish',
+            'addSideDish' => 'addDish',
+            'cancelReview' => 'setReview',
+            "echo:updatedOrder.{$this->order->id},OrderUpdatedEvent" => '$refresh',
+        ];
+    }
 
     protected $rules = [
         'dishes.*.quantity' => 'required|numeric',
@@ -38,15 +41,17 @@ class Details extends Component
         'dishes.*.side' => 'nullable'
     ];
 
-    public function mount()
+    public function mount(Order $order = null)
     {
+
+        $this->order = $order;
         $this->isReviewing = false;
         $this->categories = Category::all();
         $dishes = Category::find(1)->dishes->sortBy('name');
         $this->dishes = $dishes->each(function ($dish) {
             $dish['quantity'] = 1;
         });
-        if ($this->order) {
+        if ($this->order->getAttributes()) {
             $this->oldOrders = $this->order->orderDetails;
             $this->oldCustomOrders = $this->order->customOrderDetails;
         }
@@ -55,24 +60,6 @@ class Details extends Component
     public function setReview()
     {
         $this->isReviewing = false;
-    }
-
-    public function void($itemId, $isCustom)
-    {
-        if ($isCustom == false) {
-            $item = OrderDetails::findOrFail($itemId);
-        } else {
-            $item = CustomDish::findOrFail($itemId);
-        }
-        $item->delete();
-
-        if ($this->order) {
-            $order = Order::findOrFail($this->order->id);
-            $this->oldOrders = $order->orderDetails;
-            $this->oldCustomOrders = $order->customOrderDetails;
-            event(new OrderUpdatedEvent($this->order));
-        }
-        //
     }
 
     public function viewDishes($categoryId = null)
@@ -114,6 +101,7 @@ class Details extends Component
                 if ( $d['id'] == $dish->id && ($d['side_id'] == null || $d['side_id'] == $sideDish->id) ) {
                     $d['quantity'] += $quantity;
                     $d['price'] = $d['quantity'] * $dish->price;
+                    $d['price_per_piece'] = $dish->price;
                     $newDish[$i] = $d;
                 }
             }
@@ -125,6 +113,7 @@ class Details extends Component
                 'id' => $dish->id,
                 'name' => $dish->name,
                 'price' => $dish->price * $quantity,
+                'price_per_piece' => $dish->price,
                 'quantity' => $quantity,
                 'side_id' => $sideDish->id ?? null,
                 'side_name' => $sideDish->name ?? null,
@@ -141,6 +130,7 @@ class Details extends Component
         $this->orderedDishes[] = [
             'name' => $customDish['name'],
             'price' => $customDish['price'] * $customDish['pcs'],
+            'price_per_piece' => $customDish['price'],
             'desc' => $customDish['desc'],
             'quantity' => $customDish['pcs'],
             'type' => $customDish['type'],

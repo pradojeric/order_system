@@ -18,6 +18,7 @@ class CreateOrderDetailsTable extends Migration
             $table->foreignId('order_id');
             $table->foreignId('dish_id');
             $table->integer('pcs');
+            $table->float('price_per_piece');
             $table->float('price');
             $table->timestamps();
         });

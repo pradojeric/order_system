@@ -98,13 +98,21 @@ class Report extends Component
             'waiters' => User::whereHas('role', function ($role) {
                     $role->where('name', 'waiter');
                 })
-                ->with(['orders' => function ($order) {
-                    $order->withTrashed()
-                        ->when($this->dateType == 'single', function($query){
-                            $query->whereDate('orders.created_at', $this->date);
+                // ->with(['orders' => function ($order) {
+                //     $order->withTrashed()
+                //         ->when($this->dateType == 'single', function($query){
+                //             $query->whereDate('orders.created_at', $this->date);
+                //         })
+                //         ->when($this->dateType == 'range', function($query) {
+                //             $query->whereRaw('DATE(orders.created_at) BETWEEN ? AND ?', [$this->date1, $this->date2]);
+                //         });
+                // }])
+                ->with(['cancelled' => function ($cancel) {
+                    $cancel->when($this->dateType == 'single', function($query){
+                            $query->whereDate('cancels.created_at', $this->date);
                         })
                         ->when($this->dateType == 'range', function($query) {
-                            $query->whereRaw('DATE(orders.created_at) BETWEEN ? AND ?', [$this->date1, $this->date2]);
+                            $query->whereRaw('DATE(cancels.created_at) BETWEEN ? AND ?', [$this->date1, $this->date2]);
                         });
                 }])
                 ->get(),

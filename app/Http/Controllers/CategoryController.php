@@ -42,7 +42,7 @@ class CategoryController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'description' => 'required',
-            'type' => 'required|in:foods,drinks',
+            'type' => 'required|in:foods,drinks,alcoholic',
             'add_on' => 'nullable',
             'side_dish' => 'nullable',
             'icon' => 'nullable|image',
@@ -100,7 +100,7 @@ class CategoryController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'description' => 'required',
-            'type' => 'required|in:foods,drinks',
+            'type' => 'required|in:foods,drinks,alcoholic',
             'icon' => 'nullable|image',
         ]);
 

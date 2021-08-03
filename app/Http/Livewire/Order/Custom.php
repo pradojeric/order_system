@@ -21,7 +21,7 @@ class Custom extends Modal
         'customDescription' => 'required',
         'customPrice' => 'required',
         'customPcs' => 'required',
-        'customType' => 'required|in:foods,drinks',
+        'customType' => 'required|in:foods,drinks,alcoholic',
     ];
 
     public function addCustomDish()

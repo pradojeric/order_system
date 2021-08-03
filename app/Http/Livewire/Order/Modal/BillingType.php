@@ -36,7 +36,6 @@ class BillingType extends Modal
         $this->toggleModal();
         if($this->order->orderReceipts->count() > 0)
         {
-
             $this->receipts = $this->order->orderReceipts->each(function($r) {
                 $r['amount'] = '';
             })->toArray();
@@ -87,6 +86,7 @@ class BillingType extends Modal
 
     public function saveReceipts()
     {
+        // dd($this->receipts);
         $this->validate();
         if(!$this->isBillEqualPrice && $this->billingType == "multiple")
         {
@@ -97,7 +97,7 @@ class BillingType extends Modal
         $data = [];
         foreach($this->receipts as $receipt)
         {
-            if($receipt['amount'] == '')
+            if(!array_key_exists('amount', $receipt) || $receipt['amount'] == '')
             {
                 $receipt['amount'] = $this->order->totalPrice() / count($this->receipts);
             }

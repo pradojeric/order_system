@@ -12,6 +12,33 @@
 
 namespace App\Models{
 /**
+ * App\Models\Cancel
+ *
+ * @property int $id
+ * @property int $waiter_id
+ * @property string $cancellable_type
+ * @property int $cancellable_id
+ * @property string $reason
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $cancellable
+ * @property-read \App\Models\User $waiter
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel whereCancellableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel whereCancellableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel whereReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cancel whereWaiterId($value)
+ */
+	class Cancel extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\Category
  *
  * @property int $id
@@ -77,28 +104,31 @@ namespace App\Models{
  * @property int $printed
  * @property string $type
  * @property int $pcs
+ * @property float $price_per_piece
  * @property float $price
+ * @property float|null $discount
+ * @property string|null $discount_no
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Cancel[] $cancel
+ * @property-read int|null $cancel_count
  * @property-read \App\Models\Order $order
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish newQuery()
- * @method static \Illuminate\Database\Query\Builder|CustomDish onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish query()
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereDiscountNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish wherePcs($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CustomDish wherePricePerPiece($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish wherePrinted($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|CustomDish withTrashed()
- * @method static \Illuminate\Database\Query\Builder|CustomDish withoutTrashed()
  */
 	class CustomDish extends \Eloquent {}
 }
@@ -157,10 +187,13 @@ namespace App\Models{
  * @property int $enable_discount
  * @property string|null $discount_type
  * @property float|null $discount
+ * @property string|null $discount_ref
  * @property float|null $tip
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Cancel[] $cancel
+ * @property-read int|null $cancel_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\CustomDish[] $customOrderDetails
  * @property-read int|null $custom_order_details_count
  * @property-read mixed $discount_option
@@ -185,6 +218,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountRef($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereEnableDiscount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
@@ -211,28 +245,32 @@ namespace App\Models{
  * @property int $printed
  * @property array|null $side_dishes
  * @property int $pcs
+ * @property float $price_per_piece
  * @property float $price
+ * @property float|null $discount
+ * @property string|null $discount_no
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Cancel[] $cancel
+ * @property-read int|null $cancel_count
  * @property-read \App\Models\Dish $dish
+ * @property-read \App\Models\Order $order
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails drinks()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails newQuery()
- * @method static \Illuminate\Database\Query\Builder|OrderDetails onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereDiscountNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereDishId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePcs($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePricePerPiece($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePrinted($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereSideDishes($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|OrderDetails withTrashed()
- * @method static \Illuminate\Database\Query\Builder|OrderDetails withoutTrashed()
  */
 	class OrderDetails extends \Eloquent {}
 }
@@ -332,6 +370,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Table[] $assignTables
  * @property-read int|null $assign_tables_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Cancel[] $cancelled
+ * @property-read int|null $cancelled_count
  * @property-read mixed $full_name
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count

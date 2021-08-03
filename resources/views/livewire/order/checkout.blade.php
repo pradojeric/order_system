@@ -70,6 +70,38 @@
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col flex-shrink justify-center">
 
+                        <div class="text-sm flex flex-row justify-between mb-2">
+                            <span>
+                                SubTotal:
+                            </span>
+                            <span>
+                                ₱ {{number_format( $subTotal, 2, '.', ',') }}
+                            </span>
+                        </div>
+
+                        <!-- if Enable Discount -->
+                        @if($enableDiscount)
+
+                        <div class="text-xs flex flex-row justify-between mb-2">
+                            <span>
+                                Discount:
+                            </span>
+                            <span>
+                                ({{ $discount }})
+                            </span>
+                        </div>
+                        @endif
+                        <!-- End Enable Discount -->
+
+                        <div class="text-xs flex flex-row justify-between mb-2">
+                            <span>
+                                Service Charge:
+                            </span>
+                            <span>
+                                {{number_format( $serviceCharge, 2, '.', ',') }}
+                            </span>
+                        </div>
+
                         <div class="text-sm font-bold flex flex-row justify-between mb-2">
                             <span>
                                 Total:
@@ -78,26 +110,7 @@
                                 ₱ {{number_format( $totalPrice, 2, '.', ',') }}
                             </span>
                         </div>
-                        @if($enableDiscount)
-                        <!-- if Enable Discount -->
-                        <div class="text-sm font-bold flex flex-row justify-between mb-2">
-                            <span>
-                                Discount type:
-                            </span>
-                            <span>
-                                {{ $discountType }}
-                            </span>
-                        </div>
-                        <div class="text-sm font-bold flex flex-row justify-between mb-2">
-                            <span>
-                                Discount:
-                            </span>
-                            <span>
-                                {{ $discountType == 'percent' ? "$discount%" : "₱ ".number_format( $discount, 2, '.', ',') }}
-                            </span>
-                        </div>
-                        @endif
-                        <!-- End Enable Discount -->
+
 
                         <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
                             <span>
@@ -151,7 +164,7 @@
                             <span>
                                 Change:
                             </span>
-                            <span>₱ {{ $change ?? '0' }} </span>
+                            <span>₱ {{ number_format($change, 2, '.', ',') ?? '0' }} </span>
                         </div>
 
                         <button type="button" wire:click="confirmCheckOut" id="cOut" wire:loading.attr="disabled"

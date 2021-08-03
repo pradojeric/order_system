@@ -15,7 +15,7 @@ class AddTypeToCategoriesTable extends Migration
     {
         Schema::table('categories', function (Blueprint $table) {
             //
-            $table->enum('type', ['foods', 'drinks'])->after('description');
+            $table->enum('type', ['foods', 'drinks', 'alcoholic'])->after('description');
         });
     }
 

@@ -63,7 +63,7 @@
             </div>
             <div class="flex items-center w-8">
                 <button type="button" class="w-5" @if(!empty($order))
-                    wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $order->id }}, 1)">
+                    wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $order->id }}, 1, 'order')">
                     @endif
                     <i class="fa fa-trash {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
                 </button>

@@ -13,12 +13,7 @@ class CreateSoftDeletesToOrderDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::table('order_details', function (Blueprint $table) {
-            $table->softDeletes();
-        });
-        Schema::table('custom_dishes', function (Blueprint $table) {
-            $table->softDeletes();
-        });
+
         Schema::table('orders', function (Blueprint $table) {
             $table->softDeletes();
         });
@@ -31,12 +26,6 @@ class CreateSoftDeletesToOrderDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::table('order_details', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
-        Schema::table('custom_dishes', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
         Schema::table('orders', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });

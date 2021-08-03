@@ -36,6 +36,7 @@
                         <option selected disabled>Select Type</option>
                         <option value="foods">Foods</option>
                         <option value="drinks">Drinks</option>
+                        <option value="alcoholic">Alcoholic Drinks</option>
                     </x-select>
                 </div>
 

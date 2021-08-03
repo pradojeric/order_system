@@ -49,16 +49,7 @@
                             <x-button class="ml-3">Edit</x-button>
                         </form>
                     </div>
-                    <div class="px-6 py-3">
-                        <form action="#" method="post">
-                            @csrf
-                            @method('put')
-                            <x-label for="discount">{{ __('Edit discount') }}</x-label>
-                            <x-input type="text" class="w-52" id="discount" name="discount"
-                                :value="$config->discount" />
-                            <x-button class="ml-3">Edit</x-button>
-                        </form>
-                    </div>
+
                 </div>
             </div>
         </div>

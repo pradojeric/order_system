@@ -37,6 +37,7 @@
                         <option selected disabled>Select Type</option>
                         <option value="foods" {{ $menu->type == "foods" ? 'selected' : '' }}>Foods</option>
                         <option value="drinks" {{ $menu->type == "drinks" ? 'selected' : '' }}>Drinks</option>
+                        <option value="alcoholic" {{ $menu->type == "alcoholic" ? 'selected' : '' }}>Alcoholic Drinks</option>
                     </x-select>
                 </div>
 

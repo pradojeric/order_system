@@ -129,7 +129,7 @@
                                 {{ $order->waiter->full_name }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                {{ '₱ '. number_format($order->totalPriceWithoutDiscount(), 2, '.', ',') }}</td>
+                                {{ '₱ '. number_format($order->totalPriceWithServiceCharge(), 2, '.', ',') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $order->discount_option }}
                             </td>
@@ -160,7 +160,7 @@
                         <tr>
                             <td colspan="5"></td>
                             <td class="text-center text-md text-gray-500 py-4">Subtotal</td>
-                            <td colspan="2" class="text-right text-md text-gray-500 py-4 px-6">
+                            <td colspan="5" class="text-right text-md text-gray-500 py-4 px-6">
                                 <span>
 
                                     {{ "P ". number_format($orders->sum('total'), 2, '.',',') }}
@@ -255,13 +255,10 @@
                                 Waiter Name</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Dine In</th>
+                                Kitchen</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Take Out</th>
-                            <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Delivery</th>
+                                Bar</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Total</th>
@@ -279,19 +276,16 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $waiter->full_name }}
                             <td class="text-sm px-6 py-4 whitespace-nowrap text-gray-900">
-                                {{ $waiter->ordersBy('Dine In') }}
+                                ₱ {{ $waiter->runInKitchen()}}
                             </td>
                             <td class="text-sm px-6 py-4 whitespace-nowrap text-gray-900">
-                                {{ $waiter->ordersBy('Take Out') }}
+                                ₱ {{ $waiter->runInBar() }}
                             </td>
                             <td class="text-sm px-6 py-4 whitespace-nowrap text-gray-900">
-                                {{ $waiter->ordersBy('Delivery') }}
+                                ₱ {{ $waiter->ordersBy() }}
                             </td>
                             <td class="text-sm px-6 py-4 whitespace-nowrap text-gray-900">
-                                {{ $waiter->ordersBy() }}
-                            </td>
-                            <td class="text-sm px-6 py-4 whitespace-nowrap text-gray-900">
-                                {{ $waiter->getTip() }}
+                                ₱ {{ $waiter->getTip() }}
                             </td>
                             <td class="text-sm px-6 py-4 whitespace-nowrap text-gray-900">
                                 <ul>

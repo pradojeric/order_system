@@ -78,36 +78,65 @@ class User extends Authenticatable
         } else {
             $total = $this->orders->where('action', $action)->sum('total');
         }
-        return "₱ " . number_format($total, 2, '.', ',');
+        return number_format($total, 2, '.', ',');
+    }
+
+    public function runInBar()
+    {
+        $total = $this->orders->map->orderDetails->flatten()->map(function($item) {
+            if($item->dish->category->type == 'alcoholic'){
+                return $item->price;
+            }
+        })->sum();
+
+        return number_format($total, 2, '.', ',');
+    }
+
+    public function runInKitchen()
+    {
+        $total = $this->orders->map->orderDetails->flatten()->map(function($item) {
+            if($item->dish->category->type <> 'alcoholic'){
+                return $item->price;
+            }
+        })->sum();
+
+        return number_format($total, 2, '.', ',');
     }
 
     public function getTip()
     {
         $tip = $this->orders->map(function ($order) {
-            return ['orderTip' => $order->tip * $order->total / 100];
+            return ['orderTip' => $order->serviceCharge()];
         })->sum('orderTip');
-        return "₱ " . $tip;
+        return number_format($tip, 2, '.', ',');
     }
 
     public function trashedOrders()
     {
-        return $this->orders->where('deleted_at', '!=', NULL)->count();
+        return $this->cancelled->where('cancellable_type', '=', 'App\Models\Order')->count();
+        //return $this->orders->where('deleted_at', '!=', NULL)->count();
     }
 
     public function orderErrors()
     {
-        $orders =  $this->orders->where('deleted_at', '==', NULL);
-        $orderDetailsSum = $orders->map(function ($order) {
-            return $order->orderDetails()->onlyTrashed()->count();
-        })->sum();
-        $customDetailSum = $orders->map(function ($order) {
-            return $order->customOrderDetails()->onlyTrashed()->count();
-        })->sum();
-        return $orderDetailsSum + $customDetailSum;
+        // $orders =  $this->orders->where('deleted_at', '==', NULL);
+        // $orderDetailsSum = $orders->map(function ($order) {
+        //     return $order->orderDetails()->onlyTrashed()->count();
+        // })->sum();
+        // $customDetailSum = $orders->map(function ($order) {
+        //     return $order->customOrderDetails()->onlyTrashed()->count();
+        // })->sum();
+        // return $orderDetailsSum + $customDetailSum;
+        return $this->cancelled->where('cancellable_type', '<>', 'App\Models\Order')->count();;
     }
 
     public function assignTables()
     {
         return $this->belongsToMany(Table::class, 'table_waiter', 'waiter_id', 'table_id')->withPivot(['table_name']);
+    }
+
+    public function cancelled()
+    {
+        return $this->hasMany(Cancel::class, 'waiter_id');
     }
 }

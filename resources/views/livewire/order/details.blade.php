@@ -72,9 +72,9 @@
                             @foreach ($oldOrders as $i => $item)
                             <div class="flex justify-around mb-5 xl:text-sm text-xs" wire:model="oldOrders.{{ $i }}">
                                 <button type="button" class="w-5"
-                                    wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $item->id }}, 0)">
-                                    <i
-                                        class="fa fa-minus-circle {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
+                                    {{-- wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $item->id }}, 0)" --}}
+                                    wire:click.prevent="$emitTo('order.modal.cancel', 'cancelDish', {{ $item->id }} , 0)" >
+                                    <i class="fa fa-minus-circle {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
                                 </button>
                                 <div class="flex flex-col w-28">
                                     <div class="flex flex-col">
@@ -97,9 +97,8 @@
                             @foreach($oldCustomOrders as $i => $item)
                             <div class="flex justify-around mb-5 xl:text-sm text-xs">
                                 <button type="button" class="w-5"
-                                    wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $item->id }}, 1)">
-                                    <i
-                                        class="fa fa-minus-circle {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
+                                    wire:click.prevent="$emitTo('order.modal.cancel', 'cancelDish', {{ $item->id }} , 1)" >
+                                    <i class="fa fa-minus-circle {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
                                 </button>
                                 <div class="flex flex-col w-28">
                                     <div class="flex flex-col">
@@ -172,9 +171,7 @@
     </div>
     @livewire('order.review', ['table' => $table, 'action' => $action, 'order' => $order])
     @livewire('order.custom');
+    @livewire('order.modal.cancel');
     @livewire('order.modal.add-on');
-    @can('manage')
-    @livewire('auth.passcode')
-    @endcan
 
 </div>

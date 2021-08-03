@@ -24,11 +24,6 @@
                     </x-nav-link>
                 </div>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('admin.menus.index')" :active="request()->routeIs('admin.menus.*')">
-                        {{ __('Menu') }}
-                    </x-nav-link>
-                </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('admin.dishes.index')" :active="request()->routeIs('admin.dishes.*')">
@@ -36,11 +31,6 @@
                     </x-nav-link>
                 </div>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('admin.tables.index')" :active="request()->routeIs('admin.tables.*')">
-                        {{ __('Table') }}
-                    </x-nav-link>
-                </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link href="/admin/reports" :active="request()->is('admin/reports')">
@@ -73,6 +63,15 @@
 
                     <x-slot name="content">
                         @can('manage')
+
+                        <x-dropdown-link :href="route('admin.menus.index')">
+                            {{ __('Menu') }}
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('admin.tables.index')">
+                            {{ __('Table') }}
+                        </x-dropdown-link>
+
                         <x-dropdown-link href="/admin/config">
                             {{ __('Config') }}
                         </x-dropdown-link>

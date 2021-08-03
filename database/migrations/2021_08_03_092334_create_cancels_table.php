@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCustomDishesTable extends Migration
+class CreateCancelsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,11 @@ class CreateCustomDishesTable extends Migration
      */
     public function up()
     {
-        Schema::create('custom_dishes', function (Blueprint $table) {
+        Schema::create('cancels', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id');
-            $table->string('name');
-            $table->longtext('description');
-            $table->integer('pcs');
-            $table->float('price_per_piece');
-            $table->float('price');
+            $table->foreignId('waiter_id')->constrained('users')->cascadeOnDelete();
+            $table->morphs('cancellable');
+            $table->string('reason');
             $table->timestamps();
         });
     }
@@ -32,6 +29,6 @@ class CreateCustomDishesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('custom_dishes');
+        Schema::dropIfExists('cancels');
     }
 }

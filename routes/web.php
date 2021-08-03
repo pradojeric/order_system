@@ -32,9 +32,7 @@ Route::get('/print/{order}/{reprint?}', [OrderController::class, 'printReceipt']
 Route::get('/print-po/{order}', [OrderController::class, 'printPurchasOrder']);
 
 Route::get('/test', function () {
-    $pdf = App::make('dompdf.wrapper');
-    $pdf->loadHTML('<h1>Test</h1>');
-    return $pdf->stream();
+    return Auth::user()->runInKitchen();
 
 });
 

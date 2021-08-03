@@ -58,7 +58,7 @@
 
                     <x-select-multiple name="role_id" id="role_id">
                         @foreach ($roles as $role)
-                        <option value="{{ $role->id }}" class="text-sm">{{ $role->name }}</option>
+                            <option value="{{ $role->id }}" class="text-sm">{{ $role->name }}</option>
                         @endforeach
 
                     </x-select-multiple>

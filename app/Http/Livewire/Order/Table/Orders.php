@@ -39,7 +39,7 @@ class Orders extends Component
         ];
         if($this->order) {
             $listeners["echo:updatedOrder.{$this->order->id},OrderUpdatedEvent"] = 'resetDiscount';
-            $listeners['void'] = 'void';
+            $listeners["voidOrder.{$this->order->id}"] = 'void';
         }
         return $listeners;
     }
@@ -64,13 +64,15 @@ class Orders extends Component
 
         $item = Order::find($itemId);
         if ($item == null) return;
-        foreach ($item->orderDetails as $detail) {
-            $detail->delete();
-        }
-        foreach ($item->customOrderDetails as $detail) {
-            $detail->delete();
-        }
+
+        $item->cancel()->create([
+            'waiter_id' => $item->waiter_id,
+            'reason' => 'Order voided',
+        ]);
+
         $item->delete();
+
+
         event(new AnyOrderUpdatedEvent());
         //
     }

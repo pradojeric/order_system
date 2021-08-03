@@ -67,7 +67,8 @@ class OrderController extends Controller
                 if($i->printed && $reprint == 0) continue;
                 if($i->isDrink()){
                     $drinks[] = new item($i->dish->name, $i->pcs);
-                }else{
+                }
+                if($i->isFood()){
                     $dishName = $i->dish->name;
                     $description = $i->side_dishes ?  "side: ".$i->side_dishes['side_name'] : null;
 
@@ -83,7 +84,8 @@ class OrderController extends Controller
 
                 if($i->isDrink()){
                     $drinks[] = new item($itemName, $i->pcs, $i->description);
-                }else{
+                }
+                if($i->isFood()){
                     $foods[] = new item($itemName, $i->pcs, $i->description);
                 }
                 $i->printed = true;
@@ -178,7 +180,8 @@ class OrderController extends Controller
 
             $cash = new receiptItem('Cash', number_format($order->cash, 2, '.', ','));
             $change = new receiptItem('Change', number_format($order->change, 2, '.', ','));
-            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPriceWithoutDiscount(), 2, '.', ','));
+            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPriceWithServiceCharge(), 2, '.', ','));
+            $serviceCharge = new receiptItem('Service', number_format($order->serviceCharge(), 2, '.', ','));
             $discount = new receiptItem('Discount' , $order->discount_option);
             $totalDiscounted = new receiptItem('Total' , number_format($order->totalPrice(),2, '.', ','));
 
@@ -221,6 +224,7 @@ class OrderController extends Controller
                 $printer->text($discount->getAsString($length));
             }
 
+            $printer->text($serviceCharge->getAsString($length));
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer->text($totalDiscounted->getAsString());
             $printer->selectPrintMode();

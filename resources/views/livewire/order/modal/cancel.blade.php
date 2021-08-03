@@ -33,46 +33,38 @@
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex-shrink-0 flex items-center justify-center mx-auto">
                         <!-- Heroicon name: outline/exclamation -->
-                        {{ __('CUSTOM DISH') }}
+                        {{ __('Void Dish') }}
                     </div>
                 </div>
-                <form wire:submit.prevent="addCustomDish" class="space-y-3">
+                <form wire:submit.prevent="updateTableName">
                     <div class="flex flex-col px-4">
-                        <x-label for="customDish">{{ _('Dish Name') }}</x-label>
-                        <x-input type="text" class="w-full" wire:model="customDish" id="customDish" required />
-                        @error('customDish') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                        <span>
+                            Dish: {{ $dish }}
+                        </span>
+                        <span>
+                            Pcs: {{ $pcs }}
+                        </span>
                     </div>
-                    <div class="flex flex-col px-4">
-                        <x-label for="customDescription">{{ _('Dish Description') }}</x-label>
-                        <x-textarea type="text" class="w-full" wire:model="customDescription" id="customDescription"
-                            required />
-                        @error('customDescription') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="px-4">
-                        <x-label for="type" :value="__('Dish Type')"></x-label>
-                        <x-select id="type" class="block mt-1 w-full font-medium text-sm" wire:model="customType">
-                            <option selected>Select Type</option>
-                            <option value="foods">Foods</option>
-                            <option value="drinks">Drinks</option>
-                            <option value="alcoholic">Alcoholic</option>
-                        </x-select>
-                        @error('customType') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="flex flex-col px-4">
-                        <x-label for="customPrice">{{ _('Dish Price') }}</x-label>
-                        <x-input type="number" class="w-full" wire:model="customPrice" id="customPrice" required />
-                        @error('customPrice') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="flex flex-col px-4">
-                        <x-label for="customPcs">{{ _('Dish Quantity') }}</x-label>
-                        <x-input type="number" class="w-full" wire:model="customPcs" id="customPcs" required />
-                        @error('customPcs') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                    <div class="flex justify-center items-center px-4 pb-2">
+
+                        <span class="text-xs w-64">
+                            Number of item to void: {{ $qty }}
+                        </span>
+                        <div class="flex flex-col">
+                            <x-input type="number" wire:model="qty" />
+                            @error('qty')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                            @error('pcs')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
                     </div>
                 </form>
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" wire:click="addToDish"
+                    <button type="button" wire:click="voidDish"
                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Add
+                        Void
                     </button>
                     <button type="button" wire:click="close"
                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
@@ -83,4 +75,8 @@
         </div>
     </div>
     @endif
+    @can('manage')
+        @livewire('auth.passcode')
+    @endcan
 </div>
+
