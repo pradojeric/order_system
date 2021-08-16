@@ -60,12 +60,12 @@ class WaiterController extends Controller
         return view('waiter.dashboard');
     }
 
-    public function printWaiterReport(User $waiter, $startDate, $endDate = null)
+    public function printWaiterReport($waiter, $startDate, $endDate = null)
     {
         try {
 
             $orders = Order::with(['orderDetails', 'customOrderDetails'])
-                ->where('waiter_id', $waiter->id);
+                ->where('waiter_id', $waiter);
 
             if($endDate)
             {

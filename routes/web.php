@@ -31,7 +31,7 @@ Route::get('/', function () {
 
 Route::get('/print/{order}/{reprint?}', [OrderController::class, 'printReceipt']);
 Route::get('/print-bill/{order}', [OrderController::class, 'printBill']);
-Route::get('/print-waiter-report/{order}/{startDate}/{endDate?}', [WaiterController::class, 'printWaiterReport']);
+Route::get('/print-waiter-report/{waiter}/{startDate}/{endDate?}', [WaiterController::class, 'printWaiterReport']);
 Route::get('/print-po/{order}', [OrderController::class, 'printPurchasOrder']);
 
 Route::get('/test', function () {
