@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CheckRole
 {
@@ -19,7 +20,8 @@ class CheckRole
 
         foreach ($roles as $role) {
 
-            if (auth()->user()->role->name == $role || auth()->user()->role->name == 'admin') {
+            // if (auth()->user()->role->name == $role || auth()->user()->role->name == 'admin') {
+            if (Gate::check('manage')) {
 
                 return $next($request);
             }

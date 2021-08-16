@@ -62,19 +62,20 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @can('is-admin')
+                            <x-dropdown-link :href="route('admin.menus.index')">
+                                {{ __('Menu') }}
+                            </x-dropdown-link>
+
+                            <x-dropdown-link href="/admin/config">
+                                {{ __('Config') }}
+                            </x-dropdown-link>
+                        @endcan
                         @can('manage')
 
-                        <x-dropdown-link :href="route('admin.menus.index')">
-                            {{ __('Menu') }}
-                        </x-dropdown-link>
-
-                        <x-dropdown-link :href="route('admin.tables.index')">
-                            {{ __('Table') }}
-                        </x-dropdown-link>
-
-                        <x-dropdown-link href="/admin/config">
-                            {{ __('Config') }}
-                        </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.tables.index')">
+                                {{ __('Table') }}
+                            </x-dropdown-link>
                         @endcan
 
                         <x-dropdown-link :href="route('profile')">
