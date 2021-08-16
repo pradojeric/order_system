@@ -165,6 +165,64 @@ class OrderController extends Controller
         }
     }
 
+    public function printBill(Order $order)
+    {
+        try {
+
+            $items = [];
+            foreach ($order->orderDetails as $i) {
+                $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+            }
+
+            foreach ($order->customOrderDetails as $i) {
+                $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+            }
+
+            // Enter the share name for your USB printer here
+            $connector = new WindowsPrintConnector("POS-58-BAR");
+
+            /* Print a "Hello world" receipt" */
+            $printer = new Printer($connector);
+            $printer->initialize();
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->setEmphasis(true);
+            $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+            $printer->text("SABINA\n");
+            $printer->selectPrintMode();
+            $printer->text('Bonuan, Dagupan, 2400 Pangasinan');
+            $printer->setEmphasis(false);
+            $printer->feed();
+
+            /* Title of receipt */
+            $length = 60;
+            $printer->setEmphasis(true);
+            $printer->text("BILL\n");
+            $printer->setEmphasis(false);
+
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+
+            $printer->feed(2);
+
+            /* Items */
+            foreach ($items as $o) {
+                $printer->text($o->getAsString($length));
+            }
+            $printer->feed();
+
+
+            $printer->feed(3);
+
+            $printer->cut();
+
+            /* Close printer */
+            $printer->close();
+
+
+        } catch (Exception $e) {
+            echo "Couldn't print to this printer: " . $e->getMessage() . "\n";
+        }
+    }
+
     public function printPurchasOrder(Order $order)
     {
         try {

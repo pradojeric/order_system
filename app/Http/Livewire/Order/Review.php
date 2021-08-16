@@ -6,6 +6,7 @@ use App\Http\Livewire\Modal;
 use App\Models\Configuration;
 use App\Events\OrderUpdatedEvent;
 use App\Events\AnyOrderUpdatedEvent;
+use DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -97,37 +98,6 @@ class Review extends Modal
         }
         $this->validate();
 
-        $orderDetails = [];
-        $customDishes = [];
-
-        foreach ($this->orderDetails as $item) {
-            if (array_key_exists('id', $item)) {
-                $sideDishes = null;
-                if($item['side_id']){
-                    $sideDishes = [
-                        'side_id' => $item['side_id'],
-                        'side_name' => $item['side_name'],
-                    ];
-                }
-
-                $orderDetails[] = [
-                    'dish_id' => $item['id'],
-                    'pcs' => $item['quantity'],
-                    'price' => $item['price'],
-                    'price_per_piece' => $item['price_per_piece'],
-                    'side_dishes' => $sideDishes ?? null,
-                ];
-            } else {
-                $customDishes[] = [
-                    'name' => str_replace("(Custom)", "", $item['name']),
-                    'pcs' => $item['quantity'],
-                    'description' => $item['desc'],
-                    'price' => $item['price'],
-                    'price_per_piece' => $item['price_per_piece'],
-                    'type' => $item['type'],
-                ];
-            }
-        }
 
 
         if ($this->order->attributes == null) {
@@ -148,16 +118,58 @@ class Review extends Modal
             ]);
 
         }
+        DB::transaction(function () {
+
+            $orderDetails = [];
+            $customDishes = [];
+
+            try {
+                foreach ($this->orderDetails as $item) {
+                    if (array_key_exists('id', $item)) {
+
+                        $orderDetails = $this->order->orderDetails()->create( [
+                            'dish_id' => $item['id'],
+                            'pcs' => $item['quantity'],
+                            'price' => $item['price'],
+                            'price_per_piece' => $item['price_per_piece'],
+                            'note' => $item['note']
+                        ]);
+
+                        if(array_key_exists('sides', $item) && $item['sides'] != null)
+                        {
+                            foreach($item['sides'] as $side)
+                            {
+                                $orderDetails->sideDish()->create([
+                                    'side_dish_id' => $side['id']
+                                ]);
+                            }
+                        }
+
+                    } else {
+                        $customDishes[] = [
+                            'name' => str_replace("(Custom)", "", $item['name']),
+                            'pcs' => $item['quantity'],
+                            'description' => $item['desc'],
+                            'price' => $item['price'],
+                            'price_per_piece' => $item['price_per_piece'],
+                            'type' => $item['type'],
+                        ];
+                    }
+                }
 
 
+                if (count($customDishes) > 0) {
+                    $this->order->customOrderDetails()->createMany($customDishes);
+                }
 
-        $this->order->orderDetails()->createMany($orderDetails);
+                $this->config->increment('order_no');
+                DB::commit();
+            } catch (\Exception $e) {
+                dd($e->getMessage());
+                DB::rollBack();
+            }
 
-        if (count($customDishes) > 0) {
-            $this->order->customOrderDetails()->createMany($customDishes);
-        }
-
-        $this->config->increment('order_no');
+        });
 
         event(new AnyOrderUpdatedEvent());
 

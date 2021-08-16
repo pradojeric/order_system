@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Dish;
+use App\Models\User;
 use App\Models\Order;
 use App\Http\Livewire\Order\Details;
 use Illuminate\Support\Facades\Route;
@@ -29,10 +30,16 @@ Route::get('/', function () {
 });
 
 Route::get('/print/{order}/{reprint?}', [OrderController::class, 'printReceipt']);
+Route::get('/print-bill/{order}', [OrderController::class, 'printBill']);
+Route::get('/print-waiter-report/{order}/{startDate}/{endDate?}', [WaiterController::class, 'printWaiterReport']);
 Route::get('/print-po/{order}', [OrderController::class, 'printPurchasOrder']);
 
 Route::get('/test', function () {
-    return Auth::user()->runInKitchen();
+    $orders = Order::with(['orderDetails', 'customOrderDetails'])
+        ->whereDate('created_at', now()->toDateString())
+        ->where('waiter_id', 3)
+        ->get();
+    return ($orders);
 
 });
 

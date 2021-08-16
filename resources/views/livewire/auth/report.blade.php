@@ -21,8 +21,7 @@
                     <button wire:click="nextDate"><i class="fa fa-arrow-right"></i></button>
                 @endif
                 @if($dateType == 'range')
-
-                    <x-input type="date" class="w-auto text-sm" wire:model="date1" />
+                    <x-input type="date" class="w-auto text-sm" wire:model="date" />
                     <span>-</span>
                     <x-input type="date" class="w-auto text-sm" wire:model="date2" />
                 @endif
@@ -268,6 +267,10 @@
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Number of errors</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <span class="sr-only">Action</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -293,6 +296,11 @@
                                     <li>Voided ordered dishes: {{ $waiter->orderErrors() }}</li>
                                 </ul>
                             </td>
+                            <td class="text-sm px-6 py-4 whitespace-nowrap text-gray-900">
+                                <button onclick="event.preventDefault(); printPerWaiter({{ $waiter->id }})">
+                                    <i class="fa fa-print"></i>
+                                </button>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -300,6 +308,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <script>
@@ -313,6 +322,19 @@
         setTimeout(() => {
             a.close();
         }, 1000);
+    }
+
+    function printPerWaiter(id)
+    {
+
+        a = window.open('/print-waiter-report/'+id+'/{{ $date }}/{{ $date2 }}', 'myWin', 'left=50, top=50, width=400, height=800');
+        a.screenX = 0;
+        a.screenY = 0;
+        a.document.title = "Print";
+        a.focus();
+        // setTimeout(() => {
+        //     a.close();
+        // }, 1000);
     }
 
     function setup() {

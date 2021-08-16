@@ -19,7 +19,7 @@ class CheckRole
 
         foreach ($roles as $role) {
 
-            if (auth()->user()->role->name == $role) {
+            if (auth()->user()->role->name == $role || auth()->user()->role->name == 'admin') {
 
                 return $next($request);
             }

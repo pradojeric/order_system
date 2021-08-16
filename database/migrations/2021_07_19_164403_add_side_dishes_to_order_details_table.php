@@ -15,7 +15,7 @@ class AddSideDishesToOrderDetailsTable extends Migration
     {
         Schema::table('order_details', function (Blueprint $table) {
             //
-            $table->json('side_dishes')->nullable()->after('dish_id');
+            $table->longText('note')->nullable()->after('price');
             $table->boolean('printed')->default(0)->after('dish_id');
         });
     }
@@ -29,7 +29,7 @@ class AddSideDishesToOrderDetailsTable extends Migration
     {
         Schema::table('order_details', function (Blueprint $table) {
             //
-            $table->dropColumn('side_dishes');
+            $table->dropColumn('note');
             $table->dropColumn('printed');
         });
     }

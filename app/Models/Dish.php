@@ -22,6 +22,11 @@ class Dish extends Model
         return $query->where('sides', true);
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('status', '1');
+    }
+
     public function getPriceFormattedAttribute()
     {
         return "₱ " . number_format($this->price, 2, '.', ',');

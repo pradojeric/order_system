@@ -149,6 +149,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Category $category
  * @property-read mixed $price_formatted
+ * @method static \Illuminate\Database\Eloquent\Builder|Dish active()
  * @method static \Illuminate\Database\Eloquent\Builder|Dish newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Dish newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Dish query()
@@ -243,7 +244,6 @@ namespace App\Models{
  * @property int $order_id
  * @property int $dish_id
  * @property int $printed
- * @property array|null $side_dishes
  * @property int $pcs
  * @property float $price_per_piece
  * @property float $price
@@ -255,6 +255,8 @@ namespace App\Models{
  * @property-read int|null $cancel_count
  * @property-read \App\Models\Dish $dish
  * @property-read \App\Models\Order $order
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SideDish[] $sideDishes
+ * @property-read int|null $side_dishes_count
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails drinks()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails newQuery()
@@ -269,7 +271,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePricePerPiece($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePrinted($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereSideDishes($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereUpdatedAt($value)
  */
 	class OrderDetails extends \Eloquent {}
@@ -323,6 +324,29 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Role whereUpdatedAt($value)
  */
 	class Role extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\SideDish
+ *
+ * @property int $id
+ * @property int $order_details_id
+ * @property int $side_dish_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Dish $dish
+ * @property-read \App\Models\OrderDetails $order
+ * @method static \Illuminate\Database\Eloquent\Builder|SideDish newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SideDish newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SideDish query()
+ * @method static \Illuminate\Database\Eloquent\Builder|SideDish whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SideDish whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SideDish whereOrderDetailsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SideDish whereSideDishId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SideDish whereUpdatedAt($value)
+ */
+	class SideDish extends \Eloquent {}
 }
 
 namespace App\Models{

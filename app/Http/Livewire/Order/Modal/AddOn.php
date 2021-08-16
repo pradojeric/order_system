@@ -10,6 +10,7 @@ class AddOn extends Modal
 {
 
     public $addOns = [];
+    public $note;
     public $sideDish;
     public $dish;
     public $quantity;
@@ -18,21 +19,19 @@ class AddOn extends Modal
         'addOn' => 'addOn'
     ];
 
-    protected $rules = [
-        'sideDish' => 'required'
-    ];
 
-    protected $messages = [
-        'sideDish.required' => 'Please choose one side dish'
-    ];
-
-    public function mount()
+    public function updateSideDish($index)
     {
-        $this->addOns = Dish::sideDish()->get();
+        if(!$this->sideDish[$index]){
+            unset($this->sideDish[$index]);
+        }
     }
 
     public function addOn(Dish $dish, $quantity)
     {
+        $this->addOns = Dish::sideDish()->active()->get();
+        $this->sideDish = [];
+
         if (!$dish->status) return;
         $this->toggleModal();
         $this->dish = $dish;
@@ -41,10 +40,16 @@ class AddOn extends Modal
 
     public function addToOrder()
     {
-        $this->validate();
+        if($this->dish->add_on)
+        {
+            $this->validate(
+                ['sideDish' => 'required|array|size:2',],
+                ['sideDish.required' => 'Please choose two side dishes']
+            );
+        }
 
-        $this->emitTo('order.details', 'addSideDish', $this->dish, $this->quantity, $this->sideDish);
-        $this->reset('sideDish', 'dish', 'quantity');
+        $this->emitTo('order.details', 'addSideDish', $this->dish, $this->quantity, $this->note, $this->sideDish);
+        $this->reset('sideDish', 'dish', 'quantity', 'note');
         $this->close();
     }
 

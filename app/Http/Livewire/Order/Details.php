@@ -91,17 +91,18 @@ class Details extends Component
             $this->dishes[$index]['quantity'] -= 1;
     }
 
-    public function addDish(Dish $dish, $quantity, $side = null)
+    public function addDish(Dish $dish, $quantity, $note = null, $sides = null)
     {
         if (!$dish->status) return;
-        $sideDish = Dish::find($side);
+
         $newDish = [];
         foreach ($this->orderedDishes as $i => $d) {
             if (array_key_exists('id', $d)) {
-                if ( $d['id'] == $dish->id && ($d['side_id'] == null || $d['side_id'] == $sideDish->id) ) {
+                if ( $d['id'] == $dish->id && $d['sides'] == null && ( $d['note'] == $note ) ) {
                     $d['quantity'] += $quantity;
                     $d['price'] = $d['quantity'] * $dish->price;
                     $d['price_per_piece'] = $dish->price;
+                    $d['note'] = $note;
                     $newDish[$i] = $d;
                 }
             }
@@ -115,8 +116,8 @@ class Details extends Component
                 'price' => $dish->price * $quantity,
                 'price_per_piece' => $dish->price,
                 'quantity' => $quantity,
-                'side_id' => $sideDish->id ?? null,
-                'side_name' => $sideDish->name ?? null,
+                'note' => $note,
+                'sides' => $sides != null ? Dish::select('id', 'name')->whereIn('id', $sides)->get()->toArray() : null,
             ];
         }
 
@@ -141,8 +142,14 @@ class Details extends Component
 
     public function removeDish($index)
     {
-        unset($this->orderedDishes[$index]);
-        $this->orderedDishes = array_values($this->orderedDishes);
+        if($this->orderedDishes[$index]['quantity'] > 1) {
+            $this->orderedDishes[$index]['quantity']--;
+            $this->orderedDishes[$index]['price'] = $this->orderedDishes[$index]['quantity'] * $this->orderedDishes[$index]['price_per_piece'];
+        }else{
+
+            unset($this->orderedDishes[$index]);
+            $this->orderedDishes = array_values($this->orderedDishes);
+        }
         $this->total();
     }
 
@@ -150,7 +157,7 @@ class Details extends Component
     {
         $this->totalPrice = 0;
         foreach ($this->orderedDishes as $d) {
-            $this->totalPrice += $d['price'];
+            $this->totalPrice += $d['price_per_piece'] * $d['quantity'];
         }
     }
 

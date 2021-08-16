@@ -16,7 +16,7 @@ class UserController extends Controller
     public function __construct()
     {
         //
-        $this->middleware('role:operation')->except(['profile', 'editProfile']);
+        $this->middleware(['role:operation'])->except(['profile', 'editProfile']);
     }
     /**
      * Display a listing of the resource.

@@ -32,25 +32,29 @@
                 class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex-shrink-0 flex items-center justify-center mx-auto">
-                        <!-- Heroicon name: outline/exclamation -->
-                        {{ __('ADDITIONAL') }}
+                        {{ $dish->name }} x {{ $quantity }}
                     </div>
                 </div>
-
-                <form wire:submit.prevent="addToOrder">
-                    <div class="flex flex-col px-4">
-                        <span class="text-base font-medium">Choose one side dish</span>
-                        @error('sideDish')
-                            <span class="text-red-500 text-xs">{{ $message }}</span>
-                        @enderror
-                        @foreach ($addOns as $addon)
-                            <div class="flex">
-                                <input class="mr-2" type="radio" name="addOn" wire:model.lazy="sideDish" value="{{ $addon->id }}" id="addon{{ $addon->id }}" checked />
-                                <x-label for="addon{{ $addon->id }}" :value="$addon->name" />
-                            </div>
-                        @endforeach
-                    </div>
-                </form>
+                <div class="px-4 pb-4 sm:p-6 sm:pb-4 flex flex-col">
+                    <span class="text-base font-medium">Add Note</span>
+                    <x-textarea class="w-full" wire:model="note"></x-textarea>
+                </div>
+                @if($dish->add_on)
+                    <form wire:submit.prevent="addToOrder">
+                        <div class="flex flex-col px-4">
+                            <span class="text-base font-medium">Choose two side dishes</span>
+                            @error('sideDish')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                            @foreach ($addOns as $i => $addon)
+                                <div class="flex">
+                                    <input class="mr-2" type="checkbox" name="addOn" wire:model.lazy="sideDish.{{ $i }}" value="{{ $addon->id }}" id="addon{{ $addon->id }}" wire:click="updateSideDish({{ $i }})" checked />
+                                    <x-label for="addon{{ $addon->id }}" :value="$addon->name" />
+                                </div>
+                            @endforeach
+                        </div>
+                    </form>
+                @endif
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button type="button" wire:click="addToOrder"
                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">

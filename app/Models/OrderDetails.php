@@ -30,6 +30,11 @@ class OrderDetails extends Model
         return $this->belongsTo(Dish::class);
     }
 
+    public function sideDishes()
+    {
+        return $this->hasMany(SideDish::class, 'order_details_id');
+    }
+
     public function scopeDrinks($query)
     {
         return $query->whereHas('dish', function ($dish){
