@@ -76,7 +76,7 @@ class OrderController extends Controller
                     $dishName = $i->dish->name;
                     if($i->sideDishes) {
                         foreach($i->sideDishes as $side){
-                            $description .= "\n    ".$side->dish->name;
+                            $description .= "\n side: ".$side->dish->name;
                         }
                     }
 
@@ -372,7 +372,7 @@ class item
         if($this->description != '' || $this->description != null)
             $left .= $this->description;
         if($this->note != '' || $this->note != null)
-            $left .= "\n    ".$this->note;
+            $left .= "\n note: ".$this->note;
         return "$left\n";
     }
 
