@@ -178,6 +178,11 @@ class OrderController extends Controller
                 $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
             }
 
+            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPriceWithServiceCharge(), 2, '.', ','));
+            $serviceCharge = new receiptItem('Service', number_format($order->serviceCharge(), 2, '.', ','));
+            $discount = new receiptItem('Discount' , $order->discount_option);
+            $totalDiscounted = new receiptItem('Total' , number_format($order->totalPrice(),2, '.', ','));
+
             // Enter the share name for your USB printer here
             $connector = new WindowsPrintConnector("POS-58-BAR");
 
@@ -208,6 +213,17 @@ class OrderController extends Controller
                 $printer->text($o->getAsString($length));
             }
             $printer->feed();
+
+            if($order->enable_discount)
+            {
+                $printer->text($totalPrice->getAsString($length));
+                $printer->text($discount->getAsString($length));
+            }
+
+            $printer->text($serviceCharge->getAsString($length));
+            $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
+            $printer->text($totalDiscounted->getAsString());
+            $printer->selectPrintMode();
 
 
             $printer->feed(3);
