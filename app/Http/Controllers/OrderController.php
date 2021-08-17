@@ -65,15 +65,24 @@ class OrderController extends Controller
             $drinks = [];
             foreach ($order->orderDetails as $i) {
                 if($i->printed && $reprint == 0) continue;
+
+                $description = '';
                 if($i->isDrink()){
-                    $drinks[] = new item($i->dish->name, $i->pcs);
+
+                    $drinks[] = new item($i->dish->name, $i->pcs, $description, $i->note);
                 }
+
                 if($i->isFood()){
                     $dishName = $i->dish->name;
-                    $description = $i->side_dishes ?  "side: ".$i->side_dishes['side_name'] : null;
+                    if($i->sideDishes) {
+                        foreach($i->sideDishes as $side){
+                            $description .= "\n    ".$side->dish->name;
+                        }
+                    }
 
-                    $foods[] = new item($dishName, $i->pcs, $description);
+                    $foods[] = new item($dishName, $i->pcs, $description, $i->note);
                 }
+
                 $i->printed = true;
                 $i->save();
             }
@@ -334,12 +343,14 @@ class item
     private $name;
     private $description;
     private $quantity;
+    private $note;
 
-    public function __construct($name = '', $quantity = '', $description = '')
+    public function __construct($name = '', $quantity = '', $description = '', $note = '')
     {
         $this->name = $name;
         $this->quantity = $quantity;
         $this->description = $description;
+        $this->note = $note;
     }
 
     public function getAsString($width = 48)
@@ -358,8 +369,10 @@ class item
         // $right = str_pad("X " . $this->quantity, $rightCols, ' ', STR_PAD_LEFT);
         // return "$left$right\n";
         $left = $this->quantity . " X  ".$this->name;
-        if($this->description != null)
-            $left .= "\n    ".$this->description;
+        if($this->description != '' || $this->description != null)
+            $left .= $this->description;
+        if($this->note != '' || $this->note != null)
+            $left .= "\n    ".$this->note;
         return "$left\n";
     }
 
