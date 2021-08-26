@@ -99,26 +99,25 @@ class Review extends Modal
         $this->validate();
 
 
-
-        if ($this->order->attributes == null) {
-
-            $this->order = Auth::user()->orders()->create([
-                'order_number' => $this->config->order_no,
-                'pax' => $this->pax,
-                'action' => $this->action,
-                'address' => $this->address,
-                'contact' => $this->contact,
-            ]);
-            if ($this->table) {
-                $this->order->tables()->sync($this->table);
-            }
-        } else {
-            $this->order->update([
-                'pax' => $this->pax,
-            ]);
-
-        }
         DB::transaction(function () {
+
+            if ($this->order->attributes == null) {
+
+                $this->order = Auth::user()->orders()->create([
+                    'order_number' => $this->config->order_no,
+                    'pax' => $this->pax,
+                    'action' => $this->action,
+                    'address' => $this->address,
+                    'contact' => $this->contact,
+                ]);
+                if ($this->table) {
+                    $this->order->tables()->sync($this->table);
+                }
+            } else {
+                $this->order->update([
+                    'pax' => $this->pax,
+                ]);
+            }
 
             $orderDetails = [];
             $customDishes = [];
@@ -139,7 +138,7 @@ class Review extends Modal
                         {
                             foreach($item['sides'] as $side)
                             {
-                                $orderDetails->sideDish()->create([
+                                $orderDetails->sideDishes()->create([
                                     'side_dish_id' => $side['id']
                                 ]);
                             }
