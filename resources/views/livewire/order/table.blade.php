@@ -8,9 +8,12 @@
             </strong>
             <div class="text-white">
                 @if($hasOrder)
-                <button onclick="event.preventDefault(); print({{ $table->order()->id  }})">
-                    <i class="fa fa-print"></i>
-                </button>
+                    <button wire:click.prevent="$emitTo('order.modal.transfer-table', 'transferOrder', {{ $table->order()->id }})">
+                        <i class="fa fa-exchange-alt"></i>
+                    </button>
+                    <button onclick="event.preventDefault(); print({{ $table->order()->id  }})">
+                        <i class="fa fa-print"></i>
+                    </button>
                 @endif
                 <button
                     wire:click.prevent="$emitTo('order.modal.edit-table', 'editTable', {{ $table->id }})">

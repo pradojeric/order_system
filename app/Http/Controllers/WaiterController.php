@@ -78,11 +78,11 @@ class WaiterController extends Controller
             $items = [];
             foreach($orders->get() as $order){
                 foreach ($order->orderDetails as $i) {
-                    $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                    $items[] = new waiterItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
                 }
 
                 foreach ($order->customOrderDetails as $i) {
-                    $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                    $items[] = new waiterItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
                 }
             }
 
@@ -141,7 +141,7 @@ class WaiterController extends Controller
 
 }
 
-class receiptItem
+class waiterItem
 {
     private $name;
     private $price;

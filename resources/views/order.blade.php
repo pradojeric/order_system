@@ -10,6 +10,7 @@
     </div>
     @livewire('order.checkout')
     @livewire('order.modal.edit-table')
+    @livewire('order.modal.transfer-table')
     @can('manage')
     @livewire('auth.passcode')
     @endcan
