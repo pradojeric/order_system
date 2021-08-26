@@ -8,9 +8,11 @@
             </strong>
             <div class="text-white">
                 @if($hasOrder)
-                    <button wire:click.prevent="$emitTo('order.modal.transfer-table', 'transferOrder', {{ $table->order()->id }})">
-                        <i class="fa fa-exchange-alt"></i>
-                    </button>
+                    @can('manage')
+                        <button wire:click.prevent="$emitTo('order.modal.transfer-table', 'transferOrder', {{ $table->order()->id }})">
+                            <i class="fa fa-exchange-alt"></i>
+                        </button>
+                    @endcan
                     <button onclick="event.preventDefault(); print({{ $table->order()->id  }})">
                         <i class="fa fa-print"></i>
                     </button>

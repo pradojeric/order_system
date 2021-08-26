@@ -70,6 +70,8 @@ class Orders extends Component
             'reason' => 'Order voided',
         ]);
 
+        $item->tables()->detach();
+
         $item->delete();
 
 
