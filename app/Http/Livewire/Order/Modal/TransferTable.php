@@ -49,9 +49,10 @@ class TransferTable extends Modal
             })->where(function($query){
                 $query->whereHas('role', function ($role) {
                     $role->where('name', 'waiter');
-                    })->whereHas('assignTables', function($query){
-                        $query->where('id', $this->newTable);
-                    });
+                    // })->whereHas('assignTables', function($query){
+                    //     $query->where('id', $this->newTable);
+                    // });
+                });
             })->orWhereHas('role', function($role){
                 $role->where('name', 'operation');
             })

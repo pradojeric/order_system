@@ -1,6 +1,11 @@
 <div>
     <div class="border border-gray-300 rounded-lg p-1 flex flex-col h-64 justify-between flex-grow" x-data>
         <div class="px-1 text-right">
+            @can('manage')
+                <button wire:click.prevent="$emitTo('order.modal.transfer-table', 'transferOrder', {{ $order->id }})">
+                    <i class="fa fa-exchange-alt"></i>
+                </button>
+            @endcan
             <button onclick="event.preventDefault(); print({{ $order->id  }})">
                 <i class="fa fa-print"></i>
             </button>

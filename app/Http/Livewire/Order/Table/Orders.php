@@ -74,7 +74,6 @@ class Orders extends Component
 
         $item->delete();
 
-
         event(new AnyOrderUpdatedEvent());
         //
     }
