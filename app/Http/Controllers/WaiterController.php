@@ -72,8 +72,10 @@ class WaiterController extends Controller
                 $orders->whereRaw('DATE(orders.created_at) BETWEEN ? AND ?', [$startDate, $endDate]);
             }
             else{
-                $orders->whereDate('orders.created_at', $this->date);
+                $orders->whereDate('orders.created_at', $startDate);
             }
+
+            $waiterName = User::find($waiter)->full_name;
 
             $items = [];
             foreach($orders->get() as $order){
@@ -113,6 +115,7 @@ class WaiterController extends Controller
             $length = 60;
             $printer->setEmphasis(true);
             $printer->text("BILL\n");
+            $printer->text($waiterName."\n");
             $printer->setEmphasis(false);
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);

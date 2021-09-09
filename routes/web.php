@@ -4,6 +4,7 @@ use App\Models\Dish;
 use App\Models\User;
 use App\Models\Order;
 use App\Http\Livewire\Order\Details;
+use App\Http\Livewire\KitchenPrint;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DishController;
 use App\Http\Controllers\UserController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WaiterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigurationController;
+use App\Events\PrintKitchenEvent;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +31,16 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/test-print-kitchen/{id}', function($id){
+    event(new PrintKitchenEvent(Order::find($id)));
+    return "print";
+});
+
+Route::get('/kitchen', KitchenPrint::class);
+
 Route::get('/print/{order}/{reprint?}', [OrderController::class, 'printReceipt']);
+Route::get('/print-kitchen/{order}', [OrderController::class, 'printKitchen']);
+
 Route::get('/print-bill/{order}', [OrderController::class, 'printBill']);
 Route::get('/print-waiter-report/{waiter}/{startDate}/{endDate?}', [WaiterController::class, 'printWaiterReport']);
 Route::get('/print-po/{order}', [OrderController::class, 'printPurchasOrder']);

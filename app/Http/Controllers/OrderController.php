@@ -174,6 +174,85 @@ class OrderController extends Controller
         }
     }
 
+    public function printKitchen(Order $order)
+    {
+        try {
+            $date = now()->toDateTimeString();
+            $foods = [];
+            $drinks = [];
+            foreach ($order->orderDetails as $i) {
+
+                $description = '';
+
+                if($i->isFood()){
+                    $dishName = $i->dish->name;
+                    if($i->sideDishes) {
+                        foreach($i->sideDishes as $side){
+                            $description .= "\n side: ".$side->dish->name;
+                        }
+                    }
+
+                    $foods[] = new item($dishName, $i->pcs, $description, $i->note);
+                }
+
+                $i->printed = true;
+                $i->save();
+            }
+
+            foreach ($order->customOrderDetails as $i) {
+
+                $itemName = $i->name;
+
+
+                if($i->isFood()){
+                    $foods[] = new item($itemName, $i->pcs, $i->description);
+                }
+                $i->printed = true;
+                $i->save();
+            }
+
+            $length = 60;
+
+            if(count($foods) > 0) {
+
+                // Enter the share name for your USB printer here
+                $connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
+
+                /* Print a "Hello world" receipt" */
+                $printer = new Printer($connector1);
+                $printer->initialize();
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->setEmphasis(true);
+                $printer->text("Kitchen\n");
+                $printer->text("Order Number: " . $order->order_number . "\n");
+                $printer->text($order->table()->name ?? '');
+                $printer->setEmphasis(false);
+                $printer->text("\n");
+                $printer->text($order->action . "\n");
+                $printer->text($date . "\n");
+                $printer->text("Server: " . $order->waiter->full_name . "\n");
+                $printer->feed(2);
+                $printer->setJustification(Printer::JUSTIFY_LEFT);
+
+                foreach ($foods as $o) {
+                    $printer->text($o->getAsString($length));
+                }
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->text('---------------------');
+
+                $printer->feed(4);
+
+                $printer->cut();
+
+                /* Close printer */
+                $printer->close();
+            }
+
+        } catch (Exception $e) {
+            echo "Couldn't print to this printer: " . $e->getMessage() . "\n";
+        }
+    }
+
     public function printBill(Order $order)
     {
         try {
@@ -190,7 +269,7 @@ class OrderController extends Controller
             $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPriceWithServiceCharge(), 2, '.', ','));
             $serviceCharge = new receiptItem('Service', number_format($order->serviceCharge(), 2, '.', ','));
             $discount = new receiptItem('Discount' , $order->discount_option);
-            $totalDiscounted = new receiptItem('Total' , number_format($order->totalPrice(),2, '.', ','));
+            $totalDiscounted = new receiptItem('Total' , number_format($order->totalPriceWithServiceCharge(), 2, '.', ','));
 
             // Enter the share name for your USB printer here
             $connector = new WindowsPrintConnector("POS-58-BAR");
@@ -263,10 +342,10 @@ class OrderController extends Controller
 
             $cash = new receiptItem('Cash', number_format($order->cash, 2, '.', ','));
             $change = new receiptItem('Change', number_format($order->change, 2, '.', ','));
-            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPriceWithServiceCharge(), 2, '.', ','));
+            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPrice(), 2, '.', ','));
             $serviceCharge = new receiptItem('Service', number_format($order->serviceCharge(), 2, '.', ','));
             $discount = new receiptItem('Discount' , $order->discount_option);
-            $totalDiscounted = new receiptItem('Total' , number_format($order->totalPrice(),2, '.', ','));
+            $totalDiscounted = new receiptItem('Total' , number_format($order->totalPriceWithServiceCharge(),2, '.', ','));
 
             // Enter the share name for your USB printer here
             $connector = new WindowsPrintConnector("POS-58-BAR");

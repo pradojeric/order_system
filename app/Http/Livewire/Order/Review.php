@@ -6,6 +6,7 @@ use App\Http\Livewire\Modal;
 use App\Models\Configuration;
 use App\Events\OrderUpdatedEvent;
 use App\Events\AnyOrderUpdatedEvent;
+use App\Events\PrintKitchenEvent;
 use DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -171,7 +172,7 @@ class Review extends Modal
         });
 
         event(new AnyOrderUpdatedEvent());
-
+        event(new PrintKitchenEvent($this->order));
         $this->dispatchBrowserEvent('printOrder', ['orderId' => $this->order->id]);
 
         // return redirect()->to('/waiter-order');
