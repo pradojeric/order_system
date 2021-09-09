@@ -103,40 +103,40 @@ class OrderController extends Controller
 
             $length = 60;
 
-            if(count($foods) > 0) {
+            // if(count($foods) > 0) {
 
-                // Enter the share name for your USB printer here
-                $connector1 = new WindowsPrintConnector("POS-58");
+            //     // Enter the share name for your USB printer here
+            //     $connector1 = new WindowsPrintConnector("POS-58");
 
-                /* Print a "Hello world" receipt" */
-                $printer = new Printer($connector1);
-                $printer->initialize();
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->setEmphasis(true);
-                $printer->text("Kitchen\n");
-                $printer->text("Order Number: " . $order->order_number . "\n");
-                $printer->text($order->table()->name ?? '');
-                $printer->setEmphasis(false);
-                $printer->text("\n");
-                $printer->text($order->action . "\n");
-                $printer->text($date . "\n");
-                $printer->text("Server: " . $order->waiter->full_name . "\n");
-                $printer->feed(2);
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
+            //     /* Print a "Hello world" receipt" */
+            //     $printer = new Printer($connector1);
+            //     $printer->initialize();
+            //     $printer->setJustification(Printer::JUSTIFY_CENTER);
+            //     $printer->setEmphasis(true);
+            //     $printer->text("Kitchen\n");
+            //     $printer->text("Order Number: " . $order->order_number . "\n");
+            //     $printer->text($order->table()->name ?? '');
+            //     $printer->setEmphasis(false);
+            //     $printer->text("\n");
+            //     $printer->text($order->action . "\n");
+            //     $printer->text($date . "\n");
+            //     $printer->text("Server: " . $order->waiter->full_name . "\n");
+            //     $printer->feed(2);
+            //     $printer->setJustification(Printer::JUSTIFY_LEFT);
 
-                foreach ($foods as $o) {
-                    $printer->text($o->getAsString($length));
-                }
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text('---------------------');
+            //     foreach ($foods as $o) {
+            //         $printer->text($o->getAsString($length));
+            //     }
+            //     $printer->setJustification(Printer::JUSTIFY_CENTER);
+            //     $printer->text('---------------------');
 
-                $printer->feed(4);
+            //     $printer->feed(4);
 
-                $printer->cut();
+            //     $printer->cut();
 
-                /* Close printer */
-                $printer->close();
-            }
+            //     /* Close printer */
+            //     $printer->close();
+            // }
 
 
             if(count($drinks) > 0 ){

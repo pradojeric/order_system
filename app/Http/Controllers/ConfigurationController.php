@@ -32,7 +32,7 @@ class ConfigurationController extends Controller
     {
         //
         $this->config->update([
-            'receipt_no' => $request->order_no,
+            'receipt_no' => $request->receipt_no,
         ]);
         return back()->with('message', 'Successfully updated receipt number');
     }
