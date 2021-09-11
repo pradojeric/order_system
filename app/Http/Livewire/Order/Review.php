@@ -99,10 +99,9 @@ class Review extends Modal
         }
         $this->validate();
 
-
         DB::transaction(function () {
 
-            if ($this->order->attributes == null) {
+            if ($this->order->getAttributes() == null) {
 
                 $this->order = Auth::user()->orders()->create([
                     'order_number' => $this->config->order_no,

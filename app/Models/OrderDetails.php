@@ -46,7 +46,7 @@ class OrderDetails extends Model
 
     public function isDrink()
     {
-        return $this->dish->category->type == "alcoholic";
+        return ($this->dish->category->type == "alcoholic" || $this->dish->category->type == "drinks");
     }
 
     public function isFood()

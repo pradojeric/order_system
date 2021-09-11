@@ -7,9 +7,12 @@
     </div>
     <div>
             
-        Order Number: {{ $order->order_number ?? "No Order" }}
+        New Order: {{ $order->order_number ?? "No Order Yet" }}
     </div>
-    <x-slot name="script">
+    <div>
+        Server: {{ $order->waiter->name ?? "No Order Yet" }}
+    </div>
+    <!-- <x-slot name="script">
         <script>
 
             Echo.channel('kitchenPrint')
@@ -26,6 +29,6 @@
                 })
         </script>
 
-    </x-slot>
+    </x-slot> -->
 </div>
 
