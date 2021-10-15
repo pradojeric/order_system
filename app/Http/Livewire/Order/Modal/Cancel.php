@@ -73,8 +73,9 @@ class Cancel extends Modal
         $this->item->update([
             'price' => $this->item->pcs * $this->item->price_per_piece,
         ]);
-        if($this->item->pcs == 0)
-            return $this->item->delete();
+        if($this->item->pcs == 0){
+            $this->item->delete();
+        }
 
         $this->item->cancel()->create([
             'waiter_id' => $this->item->order->waiter_id,

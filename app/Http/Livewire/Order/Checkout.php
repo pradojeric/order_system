@@ -73,7 +73,11 @@ class Checkout extends Modal
 
         $this->subTotal = $order->totalPriceWithoutDiscount();
 
-        $this->serviceCharge = $order->totalPrice() * ($this->config->tip / 100);
+        if($order->action == "Dine In")
+            $this->serviceCharge = $order->totalPrice() * ($this->config->tip / 100);
+        else
+            $this->serviceCharge = 50;
+
         $this->totalPrice = $order->totalPrice() + $this->serviceCharge;
 
         $this->table = $order->table() ?? '';
@@ -134,7 +138,6 @@ class Checkout extends Modal
         }
 
         $this->order->update([
-            'waiter_id' => Auth::id(),
             'checked_out' => true,
             'total' => $this->totalPrice,
             'cash' => $this->cash,

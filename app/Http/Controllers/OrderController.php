@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\Order;
 use App\Models\Table;
+use App\Models\Configuration;
 use Carbon\Carbon;
 use Mike42\Escpos\Printer;
 use Illuminate\Http\Request;
@@ -61,14 +62,15 @@ class OrderController extends Controller
     public function printReceipt(Order $order, $reprint = 0)
     {
         try {
-            echo "ECHO";
+
             DB::beginTransaction();
 
             $date = now()->toDateTimeString();
             $foods = [];
             $drinks = [];
+            $new = [];
             foreach ($order->orderDetails as $i) {
-                echo $i->printed;
+                echo $i->printed."<br>";
                 if($i->printed == false){
                     $description = '';
                     if($i->isDrink()){
@@ -86,26 +88,28 @@ class OrderController extends Controller
     
                         $foods[] = new item($dishName, $i->pcs, $description, $i->note);
                     }
-    
+                    
+                    $new[] = $i->id;
                     $i->printed = true;
                     $i->save();
                 }
                 
             }
+            $newc = [];
+            foreach ($order->customOrderDetails as $c) {
+                if($c->printed == false){
+                    $itemName = $c->name;
 
-            foreach ($order->customOrderDetails as $i) {
-                
-                    $itemName = $i->name;
-
-                    if($i->isDrink()){
-                        $drinks[] = new item($itemName, $i->pcs, $i->description);
+                    if($c->isDrink()){
+                        $drinks[] = new item($itemName, $c->pcs, $c->description);
                     }
-                    if($i->isFood()){
-                        $foods[] = new item($itemName, $i->pcs, $i->description);
+                    if($c->isFood()){
+                        $foods[] = new item($itemName, $c->pcs, $c->description);
                     }
-                    $i->printed = true;
-                    $i->save();
-                
+                    $c->printed = true;
+                    $c->save();
+                    $newc[] = $c->id;
+                }
             }
 
 
@@ -114,7 +118,8 @@ class OrderController extends Controller
             if(count($foods) > 0) {
 
                 // Enter the share name for your USB printer here
-                $connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
+                //$connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
+                $connector1 = new WindowsPrintConnector("POS-58");
 
                 /* Print a "Hello world" receipt" */
                 $printer = new Printer($connector1);
@@ -185,85 +190,6 @@ class OrderController extends Controller
         }
     }
 
-    public function printKitchen(Order $order)
-    {
-        try {
-            $date = now()->toDateTimeString();
-            $foods = [];
-            $drinks = [];
-            foreach ($order->orderDetails as $i) {
-
-                $description = '';
-
-                if($i->isFood()){
-                    $dishName = $i->dish->name;
-                    if($i->sideDishes) {
-                        foreach($i->sideDishes as $side){
-                            $description .= "\n side: ".$side->dish->name;
-                        }
-                    }
-
-                    $foods[] = new item($dishName, $i->pcs, $description, $i->note);
-                }
-
-                $i->printed = true;
-                $i->save();
-            }
-
-            foreach ($order->customOrderDetails as $i) {
-
-                $itemName = $i->name;
-
-
-                if($i->isFood()){
-                    $foods[] = new item($itemName, $i->pcs, $i->description);
-                }
-                $i->printed = true;
-                $i->save();
-            }
-
-            $length = 60;
-
-            if(count($foods) > 0) {
-
-                // Enter the share name for your USB printer here
-                $connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
-
-                /* Print a "Hello world" receipt" */
-                $printer = new Printer($connector1);
-                $printer->initialize();
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->setEmphasis(true);
-                $printer->text("Kitchen\n");
-                $printer->text("Order Number: " . $order->order_number . "\n");
-                $printer->text($order->table()->name ?? '');
-                $printer->setEmphasis(false);
-                $printer->text("\n");
-                $printer->text($order->action . "\n");
-                $printer->text($date . "\n");
-                $printer->text("Server: " . $order->waiter->full_name . "\n");
-                $printer->feed(2);
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
-
-                foreach ($foods as $o) {
-                    $printer->text($o->getAsString($length));
-                }
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text('---------------------');
-
-                $printer->feed(4);
-
-                $printer->cut();
-
-                /* Close printer */
-                $printer->close();
-            }
-
-        } catch (Exception $e) {
-            echo "Couldn't print to this printer: " . $e->getMessage() . "\n";
-        }
-    }
-
     public function printBill(Order $order)
     {
         try {
@@ -276,9 +202,13 @@ class OrderController extends Controller
             foreach ($order->customOrderDetails as $i) {
                 $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
             }
-
-            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPriceWithServiceCharge(), 2, '.', ','));
-            $serviceCharge = new receiptItem('Service', number_format($order->serviceCharge(), 2, '.', ','));
+            $config = Configuration::first();
+            if($order->action == "Dine In")
+                $config_tip = $config->tip.'%';
+            else
+                $config_tip = "";
+            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPrice(), 2, '.', ','));
+            $serviceCharge = new receiptItem('Service Charge '.$config_tip, number_format($order->serviceCharge(), 2, '.', ','));
             $discount = new receiptItem('Discount' , $order->discount_option);
             $totalDiscounted = new receiptItem('Total' , number_format($order->totalPriceWithServiceCharge(), 2, '.', ','));
 
@@ -293,6 +223,7 @@ class OrderController extends Controller
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer->text("SABINA\n");
             $printer->selectPrintMode();
+            $printer->text("Leisure Coast Resort\n");
             $printer->text('Bonuan, Dagupan, 2400 Pangasinan');
             $printer->setEmphasis(false);
             $printer->feed();
@@ -312,18 +243,16 @@ class OrderController extends Controller
                 $printer->text($o->getAsString($length));
             }
             $printer->feed();
-
+            
             if($order->enable_discount)
             {
-                $printer->text($totalPrice->getAsString($length));
                 $printer->text($discount->getAsString($length));
             }
-
+            $printer->text($totalPrice->getAsString($length));
             $printer->text($serviceCharge->getAsString($length));
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer->text($totalDiscounted->getAsString());
             $printer->selectPrintMode();
-
 
             $printer->feed(3);
 
@@ -351,10 +280,15 @@ class OrderController extends Controller
                 $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
             }
 
+            $config = Configuration::first();
             $cash = new receiptItem('Cash', number_format($order->cash, 2, '.', ','));
             $change = new receiptItem('Change', number_format($order->change, 2, '.', ','));
             $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPrice(), 2, '.', ','));
-            $serviceCharge = new receiptItem('Service', number_format($order->serviceCharge(), 2, '.', ','));
+            if($order->action == "Dine In")
+                $config_tip = $config->tip.'%';
+            else
+                $config_tip = "";
+            $serviceCharge = new receiptItem('Service Charge '.$config_tip, number_format($order->serviceCharge(), 2, '.', ','));
             $discount = new receiptItem('Discount' , $order->discount_option);
             $totalDiscounted = new receiptItem('Total' , number_format($order->totalPriceWithServiceCharge(),2, '.', ','));
 
@@ -369,6 +303,7 @@ class OrderController extends Controller
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer->text("SABINA\n");
             $printer->selectPrintMode();
+            $printer->text("Leisure Coast Resort\n");
             $printer->text('Bonuan, Dagupan, 2400 Pangasinan');
             $printer->setEmphasis(false);
             $printer->feed();

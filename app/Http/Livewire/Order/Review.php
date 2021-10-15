@@ -131,7 +131,8 @@ class Review extends Modal
                             'pcs' => $item['quantity'],
                             'price' => $item['price'],
                             'price_per_piece' => $item['price_per_piece'],
-                            'note' => $item['note']
+                            'note' => $item['note'],
+                            'printed' => 0,
                         ]);
 
                         if(array_key_exists('sides', $item) && $item['sides'] != null)
@@ -152,10 +153,10 @@ class Review extends Modal
                             'price' => $item['price'],
                             'price_per_piece' => $item['price_per_piece'],
                             'type' => $item['type'],
+                            'printed' => 0,
                         ];
                     }
                 }
-
 
                 if (count($customDishes) > 0) {
                     $this->order->customOrderDetails()->createMany($customDishes);

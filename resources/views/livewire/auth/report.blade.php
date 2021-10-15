@@ -142,7 +142,8 @@
                                 ₱ {{ number_format($order->change, 2, '.', ',') }}
                             </td>
                             <td class="px-6 py-4">
-                                <button onclick="event.preventDefault(); print({{ $order->id }})">
+                                <!-- <button onclick="event.preventDefault(); print({{ $order->id }})"> -->
+                                <button x-on:click="print({{$order->id}})">
                                     <i class="fa fa-print"></i>
                                 </button>
                             </td>
@@ -297,7 +298,10 @@
                                 </ul>
                             </td>
                             <td class="text-sm px-6 py-4 whitespace-nowrap text-gray-900">
-                                <button onclick="event.preventDefault(); printPerWaiter({{ $waiter->id }})">
+                                <button type="button"
+                                    x-on:click="printPerWaiter({{$waiter->id}})">
+                                <!-- onclick="event.preventDefault(); printPerWaiter({{ $waiter->id }})" > -->
+                                    
                                     <i class="fa fa-print"></i>
                                 </button>
                             </td>
@@ -307,45 +311,70 @@
                 </table>
             </div>
         </div>
+
     </div>
+
+   
 
 </div>
 
 <script>
-    function print(id) {
+    // function print(id) {
 
-        a = window.open('/print-po/'+id, 'myWin', 'left=50, top=50, width=400, height=800');
-        a.screenX = 0;
-        a.screenY = 0;
-        a.document.title = "Print";
-        a.focus();
-        setTimeout(() => {
-            a.close();
-        }, 1000);
-    }
+    //     a = window.open('/print-po/'+id, 'myWin', 'left=50, top=50, width=400, height=800');
+    //     a.screenX = 0;
+    //     a.screenY = 0;
+    //     a.document.title = "Print";
+    //     a.focus();
+    //     setTimeout(() => {
+    //         a.close();
+    //     }, 1000);
+    // }
 
-    function printPerWaiter(id)
-    {
-
-        a = window.open('/print-waiter-report/'+id+'/{{ $date }}/{{ $date2 }}', 'myWin', 'left=50, top=50, width=400, height=800');
-        a.screenX = 0;
-        a.screenY = 0;
-        a.document.title = "Print";
-        a.focus();
-        // setTimeout(() => {
-        //     a.close();
-        // }, 1000);
-    }
+    // function printPerWaiter(id)
+    // {
+    //     a = window.open('/print-waiter-report/'+id+'/{{ $date }}/{{ $date2 }}', 'myWin', 'left=50, top=50, width=400, height=800');
+    //     a.screenX = 0;
+    //     a.screenY = 0;
+    //     a.document.title = "Print";
+    //     a.focus();
+    //     setTimeout(() => {
+    //         //a.close();
+    //     }, 1000);
+    // }
 
     function setup() {
         return {
-        activeTab: 0,
-        tabs: [
-            "Orders",
-            "Dishes",
-            "Custom Dishes",
-            "Waiters",
-        ]
+            activeTab: 0,
+            tabs: [
+                "Orders",
+                "Dishes",
+                "Custom Dishes",
+                "Waiters",
+            ],
+            date1: @entangle('date'),
+            date2: @entangle('date2'),
+            print(id) {
+                a = window.open('/print-po/'+id, 'myWin', 'left=50, top=50, width=400, height=800');
+                a.screenX = 0;
+                a.screenY = 0;
+                a.document.title = "Print";
+                a.focus();
+                setTimeout(() => {
+                    a.close();
+                }, 1000);
+            },
+            printPerWaiter(id)
+            {
+                a = window.open('/print-waiter-report/'+id+'/'+this.date1+'/'+this.date2, 'myWin', 'left=50, top=50, width=400, height=800');
+                a.screenX = 0;
+                a.screenY = 0;
+                a.document.title = "Print";
+                a.focus();
+                setTimeout(() => {
+                    a.close();
+                }, 1000);
+            },
         };
     };
 

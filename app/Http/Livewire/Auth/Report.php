@@ -18,7 +18,7 @@ class Report extends Component
     public $dateType;
     public $date;
     public $tempDate;
-    public $date2;
+    public $date2 = "";
     public $action;
 
     public $cash;
@@ -46,7 +46,7 @@ class Report extends Component
         }else
         {
             $this->date = $this->tempDate;
-            $this->date2 = null;
+            $this->date2 = "";
         }
     }
 
@@ -109,10 +109,12 @@ class Report extends Component
                 })
                 ->where('orders.checked_out', 1)
                 ->get(),
-            'waiters' => User::whereHas('role', function ($role) {
-                    $role->where('name', 'waiter');
-                })
-                ->with([
+            'waiters' => User::
+                // whereHas('role', function ($role) {
+                //     $role->where('name', 'waiter');
+                // })
+                // ->
+                with([
                     'cancelled' => function ($cancel) {
                         $cancel->when($this->dateType == 'single', function($query){
                                 $query->whereDate('cancels.created_at', $this->date);

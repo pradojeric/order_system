@@ -23,7 +23,7 @@ class CustomDish extends Model
 
     public function isDrink()
     {
-        return $this->type == 'alcoholic';
+        return $this->type == 'alcoholic' || $this->type == 'drinks';
     }
 
     public function isFood()

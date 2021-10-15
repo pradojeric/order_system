@@ -66,12 +66,12 @@
                             <x-dropdown-link :href="route('admin.menus.index')">
                                 {{ __('Menu') }}
                             </x-dropdown-link>
+                        @endcan
 
+                        @can('manage')
                             <x-dropdown-link href="/admin/config">
                                 {{ __('Config') }}
-                            </x-dropdown-link>
-                        @endcan
-                        @can('manage')
+                            </x-dropdown-link>                     
 
                             <x-dropdown-link :href="route('admin.tables.index')">
                                 {{ __('Table') }}

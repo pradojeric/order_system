@@ -6,6 +6,7 @@ use Exception;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Table;
+use App\Models\Configuration;
 use Mike42\Escpos\Printer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -78,15 +79,48 @@ class WaiterController extends Controller
             $waiterName = User::find($waiter)->full_name;
 
             $items = [];
+            $totalFoodsCost = 0;
+            $totalDrinksCost = 0;
+            $totalServiceChargeCost = 0;
+            $totalDiscountCost = 0;
+            $totalPax = 0;
+
             foreach($orders->get() as $order){
+
+                $totalDiscountCost += $order->totalDiscountedPrice();
+                $totalServiceChargeCost += $order->serviceChargeFromDB();
+                $totalPax += $order->pax;
+
                 foreach ($order->orderDetails as $i) {
                     $items[] = new waiterItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                    if($i->isDrink()){
+                        $totalDrinksCost += $i->price;
+                    }
+                    if($i->isFood()){
+                        $totalFoodsCost += $i->price;
+                    }
                 }
 
                 foreach ($order->customOrderDetails as $i) {
                     $items[] = new waiterItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                    if($i->isDrink()){
+                        $totalDrinksCost += $i->price;
+                    }
+                    if($i->isFood()){
+                        $totalFoodsCost += $i->price;
+                    }
                 }
             }
+
+            $totalSalesCost = $totalFoodsCost + $totalDrinksCost - $totalDiscountCost;
+
+            
+            $totalFoods = new waiterItem("Total Foods", number_format($totalFoodsCost, 2, '.', ','));
+            $totalDrinks = new waiterItem("Total Drinks", number_format($totalDrinksCost, 2, '.', ','));
+            $totalSales = new waiterItem("Total Sales", number_format($totalSalesCost, 2, '.', ','));
+            $totalDiscount = new waiterItem("Total Discount", number_format($totalDiscountCost, 2, '.', ','));
+            $totalServiceCharge = new waiterItem("Total Service Charge", number_format($totalServiceChargeCost, 2, '.', ','));
+            // $totalIncome = new waiterItem("Total Income", number_format($totalServiceChargeCost + $totalSalesCost - $totalDiscountCost, 2, '.', ','));
 
             // foreach ($order->orderDetails as $i) {
             //     $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
@@ -107,6 +141,7 @@ class WaiterController extends Controller
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer->text("SABINA\n");
             $printer->selectPrintMode();
+            $printer->text("Leisure Coast Resort\n");
             $printer->text('Bonuan, Dagupan, 2400 Pangasinan');
             $printer->setEmphasis(false);
             $printer->feed();
@@ -114,9 +149,10 @@ class WaiterController extends Controller
             /* Title of receipt */
             $length = 60;
             $printer->setEmphasis(true);
-            $printer->text("BILL\n");
+            $printer->text("Daily Report\n");
             $printer->text($waiterName."\n");
             $printer->setEmphasis(false);
+            $printer->text("Total Pax: ".$totalPax);
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
 
@@ -127,7 +163,12 @@ class WaiterController extends Controller
                 $printer->text($o->getAsString($length));
             }
             $printer->feed();
-
+            $printer->text($totalFoods->getAsString($length));
+            $printer->text($totalDrinks->getAsString($length));
+            $printer->text($totalDiscount->getAsString($length));
+            $printer->text($totalSales->getAsString($length));
+            $printer->text($totalServiceCharge->getAsString($length));
+            // $printer->text($totalIncome->getAsString($length));
 
             $printer->feed(3);
 
