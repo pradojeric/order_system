@@ -6,9 +6,12 @@ use Exception;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Table;
-use App\Models\Configuration;
 use Mike42\Escpos\Printer;
+use App\Models\OrderDetails;
 use Illuminate\Http\Request;
+use App\Models\Configuration;
+use App\Models\CustomDish;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 
@@ -64,6 +67,7 @@ class WaiterController extends Controller
     public function printWaiterReport($waiter, $startDate, $endDate = null)
     {
         try {
+            $date = now()->toDateTimeString();
 
             $orders = Order::with(['orderDetails', 'customOrderDetails'])
                 ->where('waiter_id', $waiter);
@@ -75,6 +79,7 @@ class WaiterController extends Controller
             else{
                 $orders->whereDate('orders.created_at', $startDate);
             }
+            $orders = $orders->get();
 
             $waiterName = User::find($waiter)->full_name;
 
@@ -84,51 +89,62 @@ class WaiterController extends Controller
             $totalServiceChargeCost = 0;
             $totalDiscountCost = 0;
             $totalPax = 0;
+            $totalCashPaid = 0;
+            $totalCheckPaid = 0;
 
-            foreach($orders->get() as $order){
+            foreach($orders as $order){
+
+                if($order->isCheck()){
+                    $totalCheckPaid += $order->total;
+                }else{
+                    $totalCashPaid += $order->total;
+                }
 
                 $totalDiscountCost += $order->totalDiscountedPrice();
                 $totalServiceChargeCost += $order->serviceChargeFromDB();
                 $totalPax += $order->pax;
 
-                foreach ($order->orderDetails as $i) {
-                    $items[] = new waiterItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
-                    if($i->isDrink()){
-                        $totalDrinksCost += $i->price;
-                    }
-                    if($i->isFood()){
-                        $totalFoodsCost += $i->price;
-                    }
-                }
+            }
 
-                foreach ($order->customOrderDetails as $i) {
-                    $items[] = new waiterItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
-                    if($i->isDrink()){
-                        $totalDrinksCost += $i->price;
-                    }
-                    if($i->isFood()){
-                        $totalFoodsCost += $i->price;
-                    }
+            $orderDetails = OrderDetails::whereIn('order_id', $orders->pluck('id'))
+                ->select('dish_id', DB::raw('SUM(order_details.pcs) as pcs'), DB::raw('SUM(order_details.price) as price'))
+                ->groupBy('dish_id')
+                ->get();
+
+            foreach ($orderDetails as $i) {
+                $items[] = new waiterItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                if($i->isDrink()){
+                    $totalDrinksCost += $i->price;
+                }
+                if($i->isFood()){
+                    $totalFoodsCost += $i->price;
+                }
+            }
+
+            $customDishes = CustomDish::whereIn('order_id', $orders->pluck('id'))->get();
+
+            foreach ($customDishes as $i) {
+                $items[] = new waiterItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                if($i->isDrink()){
+                    $totalDrinksCost += $i->price;
+                }
+                if($i->isFood()){
+                    $totalFoodsCost += $i->price;
                 }
             }
 
             $totalSalesCost = $totalFoodsCost + $totalDrinksCost - $totalDiscountCost;
 
-            
+
             $totalFoods = new waiterItem("Total Foods", number_format($totalFoodsCost, 2, '.', ','));
             $totalDrinks = new waiterItem("Total Drinks", number_format($totalDrinksCost, 2, '.', ','));
             $totalSales = new waiterItem("Total Sales", number_format($totalSalesCost, 2, '.', ','));
             $totalDiscount = new waiterItem("Total Discount", number_format($totalDiscountCost, 2, '.', ','));
             $totalServiceCharge = new waiterItem("Total Service Charge", number_format($totalServiceChargeCost, 2, '.', ','));
+
+            $totalCash = new waiterItem("Total Cash", number_format($totalCashPaid, 2, '.', ','));
+            $totalCheck = new waiterItem("Total Check", number_format($totalCheckPaid, 2, '.', ','));
             // $totalIncome = new waiterItem("Total Income", number_format($totalServiceChargeCost + $totalSalesCost - $totalDiscountCost, 2, '.', ','));
-
-            // foreach ($order->orderDetails as $i) {
-            //     $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
-            // }
-
-            // foreach ($order->customOrderDetails as $i) {
-            //     $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
-            // }
 
             // Enter the share name for your USB printer here
             $connector = new WindowsPrintConnector("POS-58-BAR");
@@ -166,17 +182,22 @@ class WaiterController extends Controller
             $printer->text($totalFoods->getAsString($length));
             $printer->text($totalDrinks->getAsString($length));
             $printer->text($totalDiscount->getAsString($length));
+
+            $printer->text($totalCash->getAsString($length));
+            $printer->text($totalCheck->getAsString($length));
             $printer->text($totalSales->getAsString($length));
+
             $printer->text($totalServiceCharge->getAsString($length));
             // $printer->text($totalIncome->getAsString($length));
 
             $printer->feed(3);
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text($date . "\n");
 
             $printer->cut();
 
             /* Close printer */
             $printer->close();
-
 
         } catch (Exception $e) {
             echo "Couldn't print to this printer: " . $e->getMessage() . "\n";

@@ -249,6 +249,7 @@ namespace App\Models{
  * @property float $price
  * @property float|null $discount
  * @property string|null $discount_no
+ * @property string|null $note
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Cancel[] $cancel
@@ -266,6 +267,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereDiscountNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereDishId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereNote($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePcs($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderDetails wherePrice($value)

@@ -64,6 +64,11 @@ class Order extends Model
         return $this->belongsTo(User::class, 'waiter_id');
     }
 
+    public function isCheck()
+    {
+        return $this->attributes['ref_no'] != null;
+    }
+
     public function totalPrice()
     {
         $total =  $this->totalPriceWithoutDiscount();

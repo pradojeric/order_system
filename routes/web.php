@@ -15,6 +15,7 @@ use App\Http\Controllers\WaiterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigurationController;
 use App\Events\PrintKitchenEvent;
+use App\Models\OrderDetails;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,10 +32,26 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/test-print-kitchen/{id}', function($id){
-    event(new PrintKitchenEvent(Order::find($id)));
-    return "print";
+Route::get('/test-order/{waiter_id?}', function($waiter_id = null) {
+    $orderIds = Order::when($waiter_id, function($q) use ($waiter_id){
+        $q->where('waiter_id', $waiter_id);
+    })->get()->pluck('id');
+
+    $orderDetails = OrderDetails::whereIn('order_id', $orderIds)
+        ->select('dish_id', DB::raw('SUM(order_details.pcs) as pcs'), DB::raw('SUM(order_details.price) as price'))
+        ->groupBy('dish_id')
+        ->get();
+
+    foreach($orderDetails as $d){
+        echo "Dish: ".$d->dish->name."<br>";
+        echo $d->pcs."<br>";
+        echo $d->price."<br>";
+        if($d->isDrink()) echo "is Drink";
+        if($d->isFood()) echo "is Food";
+        echo "<br><br>";
+    }
 });
+
 
 Route::get('/kitchen', KitchenPrint::class);
 

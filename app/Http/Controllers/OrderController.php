@@ -74,10 +74,10 @@ class OrderController extends Controller
                 if($i->printed == false){
                     $description = '';
                     if($i->isDrink()){
-    
+
                         $drinks[] = new item($i->dish->name, $i->pcs, $description, $i->note);
                     }
-    
+
                     if($i->isFood()){
                         $dishName = $i->dish->name;
                         if($i->sideDishes) {
@@ -85,15 +85,15 @@ class OrderController extends Controller
                                 $description .= "\n side: ".$side->dish->name;
                             }
                         }
-    
+
                         $foods[] = new item($dishName, $i->pcs, $description, $i->note);
                     }
-                    
+
                     $new[] = $i->id;
                     $i->printed = true;
                     $i->save();
                 }
-                
+
             }
             $newc = [];
             foreach ($order->customOrderDetails as $c) {
@@ -193,6 +193,7 @@ class OrderController extends Controller
     public function printBill(Order $order)
     {
         try {
+            $date = now()->toDateTimeString();
 
             $items = [];
             foreach ($order->orderDetails as $i) {
@@ -243,7 +244,7 @@ class OrderController extends Controller
                 $printer->text($o->getAsString($length));
             }
             $printer->feed();
-            
+
             if($order->enable_discount)
             {
                 $printer->text($discount->getAsString($length));
@@ -255,6 +256,9 @@ class OrderController extends Controller
             $printer->selectPrintMode();
 
             $printer->feed(3);
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text($date . "\n");
+            $printer->text("Server: " . $order->waiter->full_name . "\n");
 
             $printer->cut();
 
