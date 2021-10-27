@@ -53,7 +53,8 @@
                                             {{ $item['name'] }}
                                         </span>
                                         <span class="text-xs">
-                                            {{ array_key_exists('side_dish', $item) && $item['side_dish'] ? 'with '.$item['side_dish'] : '' }}
+                                            {{ array_key_exists('side_dish', $item) && $item['side_dish'] ? 'with
+                                            '.$item['side_dish'] : '' }}
                                         </span>
                                     </div>
                                     <div>
@@ -97,7 +98,8 @@
                             <span>
                                 Service Charge:
                             </span>
-                            <span>
+
+                            <span class="{{ $enableServiceCharge ? '' : 'line-through' }}">
                                 {{number_format( $serviceCharge, 2, '.', ',') }}
                             </span>
                         </div>
@@ -118,11 +120,13 @@
                             </span>
                             <div class="flex space-x-2">
                                 <div class="flex">
-                                    <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="cash" value="cash" />
+                                    <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="cash"
+                                        value="cash" />
                                     <x-label for="cash" :value="__('Cash')" />
                                 </div>
                                 <div class="flex">
-                                    <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="check" value="check" />
+                                    <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="check"
+                                        value="check" />
                                     <x-label for="check" :value="__('Check')" />
                                 </div>
                             </div>
@@ -134,8 +138,7 @@
                                 Ref Number:
                             </span>
                             <div class="flex flex-col">
-                                <x-input class="text-right h-8" wire:model="refNo"
-                                    type="text" />
+                                <x-input class="text-right h-8" wire:model="refNo" type="text" />
                                 @error('refNo')
                                 <span class="text-xs text-red-500 text-right">
                                     {{ $message }}
@@ -150,8 +153,8 @@
                                 Cash:
                             </span>
                             <div class="flex flex-col">
-                                <x-input class="text-right h-8" wire:model.number="cash" wire:keyup="computeChange" id="cash"
-                                    type="number" />
+                                <x-input class="text-right h-8" wire:model.number="cash" wire:keyup="computeChange"
+                                    id="cash" type="number" />
                                 @error('cash')
                                 <span class="text-xs text-red-500 text-right">
                                     {{ $message }}

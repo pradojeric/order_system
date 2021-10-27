@@ -109,21 +109,27 @@ class Order extends Model
     public function serviceCharge()
     {
         $config = Configuration::first();
-        if($this->action == "Dine In")
-            return $this->totalPrice() * ($config->tip / 100);
-        else
-            return 50;
-        // return $this->totalPrice() * ($this->tip / 100);
+
+        if($this->enable_tip) {
+            if($this->action == "Dine In")
+                return $this->totalPrice() * ($config->tip / 100);
+            else
+                return 50;
+        }
+        return 0;
     }
 
     public function serviceChargeFromDB()
     {
         // $config = Configuration::first();
         // return $this->totalPrice() * ($config->tip / 100);
-        if($this->action == "Dine In")
-            return $this->totalPrice() * ($this->tip / 100);
-        else
-            return 50;
+        if($this->enable_tip) {
+            if($this->action == "Dine In")
+                return $this->totalPrice() * ($this->tip / 100);
+            else
+                return 50;
+        }
+        return 0;
     }
 
     public function getDiscountOptionAttribute()

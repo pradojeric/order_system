@@ -14,6 +14,7 @@ class Orders extends Component
 
     public $message = '';
     public $enableDiscount;
+    public $enableServiceCharge;
     public $discountType;
     public $discount;
     public $action;
@@ -55,6 +56,7 @@ class Orders extends Component
             $this->enableDiscount = $this->order->enable_discount;
             $this->discountType = $this->order->discount_type;
             $this->discount = $this->order->discount;
+            $this->enableServiceCharge = !$this->order->enable_tip;
         }
     }
 
@@ -118,6 +120,13 @@ class Orders extends Component
         $this->isSaved = true;
         $this->callEvent();
     }
+
+    public function updatingEnableServiceCharge($value)
+    {
+        $this->order->enable_tip = !$value;
+        $this->order->save();
+    }
+
 
     public function callEvent()
     {

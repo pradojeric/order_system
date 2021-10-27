@@ -189,6 +189,7 @@ namespace App\Models{
  * @property string|null $discount_type
  * @property float|null $discount
  * @property string|null $discount_ref
+ * @property int $enable_tip
  * @property float|null $tip
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -222,6 +223,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountRef($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereEnableDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereEnableTip($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereOrderNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order wherePax($value)

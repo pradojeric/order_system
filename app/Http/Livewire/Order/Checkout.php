@@ -22,6 +22,7 @@ class Checkout extends Modal
     public $subTotal;
     public $serviceCharge;
     public $totalPrice;
+    public $enableServiceCharge;
 
     public $cash;
     public $change;
@@ -45,10 +46,22 @@ class Checkout extends Modal
         $this->config = Configuration::first();
     }
 
+    public function updatedEnableServiceCharge()
+    {
+        $this->computeServiceCharge();
+    }
 
     public function checkOut(Order $order)
     {
         $this->toggleModal();
+
+        $this->table = $order->table() ?? '';
+        $this->order = $order;
+        $this->orderNumber = $order->order_number;
+        $this->receiptName = '';
+        $this->paymentType = 'cash';
+        $this->refNo = null;
+
         foreach ($order->orderDetails as $item) {
 
             $this->orderDetails[] = [
@@ -70,28 +83,31 @@ class Checkout extends Modal
         $this->enableDiscount = $order->enable_discount;
         $this->discount = $order->discount_option;
         $this->discountType = $order->discount_type;
+        $this->enableServiceCharge = $order->enable_tip;
 
         $this->subTotal = $order->totalPriceWithoutDiscount();
 
-        if($order->action == "Dine In")
-            $this->serviceCharge = $order->totalPrice() * ($this->config->tip / 100);
-        else
-            $this->serviceCharge = 50;
+        $this->computeServiceCharge();
 
-        $this->totalPrice = $order->totalPrice() + $this->serviceCharge;
-
-        $this->table = $order->table() ?? '';
-        $this->order = $order;
-        $this->orderNumber = $order->order_number;
-        $this->receiptName = '';
-        $this->paymentType = 'cash';
-        $this->refNo = null;
     }
 
     public function close()
     {
         $this->toggleModal();
         $this->reset(['cash', 'change', 'orderDetails']);
+    }
+
+    public function computeServiceCharge()
+    {
+        if($this->enableServiceCharge) {
+            if($this->order->action == "Dine In")
+                $this->serviceCharge = $this->order->totalPrice() * ($this->config->tip / 100);
+            else
+                $this->serviceCharge = 50;
+        }else{
+            $this->serviceCharge = 0;
+        }
+        $this->totalPrice = $this->order->totalPrice() + $this->serviceCharge;
     }
 
     public function computeChange()
@@ -142,7 +158,7 @@ class Checkout extends Modal
             'total' => $this->totalPrice,
             'cash' => $this->cash,
             'change' => $this->change,
-            'tip' => $this->config->tip,
+            'tip' => $this->enableServiceCharge ? $this->config->tip : 0,
             'ref_no' => $this->paymentType == 'check' ? $this->refNo : null,
         ]);
 

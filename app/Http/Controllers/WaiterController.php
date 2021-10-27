@@ -95,9 +95,9 @@ class WaiterController extends Controller
             foreach($orders as $order){
 
                 if($order->isCheck()){
-                    $totalCheckPaid += $order->total;
+                    $totalCheckPaid += $order->totalDiscountedPrice();
                 }else{
-                    $totalCashPaid += $order->total;
+                    $totalCashPaid += $order->totalDiscountedPrice();
                 }
 
                 $totalDiscountCost += $order->totalDiscountedPrice();
