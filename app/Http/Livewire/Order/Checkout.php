@@ -103,7 +103,7 @@ class Checkout extends Modal
             if($this->order->action == "Dine In")
                 $this->serviceCharge = $this->order->totalPrice() * ($this->config->tip / 100);
             else
-                $this->serviceCharge = 50;
+                $this->serviceCharge = $this->config->take_out_charge;
         }else{
             $this->serviceCharge = 0;
         }

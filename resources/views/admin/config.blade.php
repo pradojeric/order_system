@@ -49,7 +49,16 @@
                             <x-button class="ml-3">Edit</x-button>
                         </form>
                     </div>
-
+                    <div class="px-6 py-3">
+                        <form action="/admin/take-out-charge-update" method="post">
+                            @csrf
+                            @method('put')
+                            <x-label for="take_out_charge">{{ __('Edit take out charge in Php') }}</x-label>
+                            <x-input type="number" class="w-52" min="0" max="100" id="take_out_charge" name="take_out_charge"
+                                :value="$config->take_out_charge" />
+                            <x-button class="ml-3">Edit</x-button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

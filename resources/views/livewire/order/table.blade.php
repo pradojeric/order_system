@@ -55,8 +55,8 @@
 
                             <div class="text-xs">
 
-                                <input type="checkbox" class="rounded" id="service_charge" value=1 {{ !$table->order()->enable_tip ? 'checked' : '' }}  wire:model="enableServiceCharge">
-                                <label for="service_charge" class="text-gray-500" >Disable Service Charge</label>
+                                <input type="checkbox" class="rounded" id="service_charge{{ $table->order()->id }}" value=1 {{ !$table->order()->enable_tip ? 'checked' : '' }}  wire:model="enableServiceCharge">
+                                <label for="service_charge{{ $table->order()->id }}" class="text-gray-500" >Disable Service Charge</label>
 
                             </div>
                         </div>

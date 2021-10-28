@@ -76,6 +76,7 @@ namespace App\Models{
  * @property string|null $tin_no
  * @property float|null $discount
  * @property float|null $tip
+ * @property int $take_out_charge
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Configuration newModelQuery()
@@ -86,6 +87,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Configuration whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Configuration whereOrderNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Configuration whereReceiptNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Configuration whereTakeOutCharge($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Configuration whereTinNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Configuration whereTip($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Configuration whereUpdatedAt($value)

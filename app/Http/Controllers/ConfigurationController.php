@@ -54,4 +54,13 @@ class ConfigurationController extends Controller
         ]);
         return back()->with('message', 'Successfully updated tip');
     }
+
+    public function editTakeOutCharge(Request $request)
+    {
+        $this->config->update([
+            'take_out_charge' => $request->take_out_charge
+        ]);
+
+        return back()->with('message', 'Successfully updated take out charge');
+    }
 }

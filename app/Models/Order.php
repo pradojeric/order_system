@@ -114,7 +114,7 @@ class Order extends Model
             if($this->action == "Dine In")
                 return $this->totalPrice() * ($config->tip / 100);
             else
-                return 50;
+                return $config->take_out_charge;
         }
         return 0;
     }
@@ -127,7 +127,7 @@ class Order extends Model
             if($this->action == "Dine In")
                 return $this->totalPrice() * ($this->tip / 100);
             else
-                return 50;
+                return $this->take_out_charge;
         }
         return 0;
     }
