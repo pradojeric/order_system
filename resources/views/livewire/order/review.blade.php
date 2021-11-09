@@ -37,24 +37,24 @@
                     <div class="flex flex-grow overflow-y-auto border">
                         <div class="w-full mt-2 px-5">
                             @forelse ($orderDetails as $i => $item)
-                            <div class="flex justify-between text-sm w-full">
-                                <div class="flex flex-col">
+                                <div class="flex justify-between text-sm w-full">
                                     <div class="flex flex-col">
-                                        <span>
-                                            {{ $item['name'] }}
-                                        </span>
-                                        <span class="text-xs">
-                                            {{ array_key_exists('side_name', $item) && $item['side_name'] ? 'with '.$item['side_name'] : '' }}
-                                        </span>
+                                        <div class="flex flex-col">
+                                            <span>
+                                                {{ $item['name'] }}
+                                            </span>
+                                            <span class="text-xs">
+                                                {{ array_key_exists('side_name', $item) && $item['side_name'] ? 'with '.$item['side_name'] : '' }}
+                                            </span>
+                                        </div>
+                                        <div class="ml-2">
+                                            X{{ $item['quantity'] }}
+                                        </div>
                                     </div>
-                                    <div class="ml-2">
-                                        X{{ $item['quantity'] }}
+                                    <div class="flex items-end">
+                                        ₱ {{number_format( $item['price'], 2, '.', ',') }}
                                     </div>
                                 </div>
-                                <div class="flex items-end">
-                                    ₱ {{number_format( $item['price'], 2, '.', ',') }}
-                                </div>
-                            </div>
                             @empty
                             <div class="text-center text-sm">
                                 <div>

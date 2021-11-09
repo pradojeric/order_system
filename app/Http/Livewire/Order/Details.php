@@ -6,9 +6,6 @@ use App\Models\Dish;
 use App\Models\Order;
 use Livewire\Component;
 use App\Models\Category;
-use App\Models\CustomDish;
-use App\Models\OrderDetails;
-use App\Events\OrderUpdatedEvent;
 
 class Details extends Component
 {

@@ -71,19 +71,27 @@ class Order extends Model
 
     public function totalPrice()
     {
-        $total =  $this->totalPriceWithoutDiscount();
+        // $total =  $this->totalPriceWithoutDiscount();
 
-        if ($this->enable_discount == true) {
-            if ($this->discount_type === 'percent') {
-                $total = $total - ($total * $this->discount / 100);
-            }
+        // if ($this->enable_discount == true) {
+        //     if ($this->discount_type === 'percent') {
+        //         $total = $total - ($total * $this->discount / 100);
+        //     }
 
-            if ($this->discount_type === 'fixed') {
-                $total = $total - $this->discount;
-            }
-        }
+        //     if ($this->discount_type === 'fixed') {
+        //         $total = $total - $this->discount;
+        //     }
+        // }
 
-        return $total;
+        // return $total;
+        $customPrices = $this->customOrderDetails->sum(function($item){
+            return $item->getPrice();
+        });
+        $orderPrices = $this->orderDetails->sum(function($item){
+            return $item->getPrice();
+        });
+
+        return $customPrices + $orderPrices;
     }
 
     public function totalPriceWithServiceCharge()
@@ -136,14 +144,9 @@ class Order extends Model
     {
         $discount = '';
         if ($this->enable_discount) {
-            if ($this->discount_type == 'percent') {
-                $discount = $this->discount . '%';
-                $discount = ' (' . $discount . ') ' . number_format($this->totalDiscountedPrice(), 2, '.', ',');
-            }
-            if ($this->discount_type == 'fixed') {
-                $discount = number_format($this->discount, 2, '.', ',');
-                $discount = number_format($this->totalDiscountedPrice(), 2, '.', ',');
-            }
+
+            $discount = number_format($this->discount, 2, '.', ',');
+            $discount = number_format($this->totalDiscountedPrice(), 2, '.', ',');
 
         } else {
             $discount = '-';

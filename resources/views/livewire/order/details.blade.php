@@ -84,7 +84,7 @@
                                                     </ul>
                                                 </span>
                                                 <span>
-                                                    "{{ $item->note }}""
+                                                    {{ $item->note ? "note: ".$item->note : '' }}
                                                 </span>
                                             </div>
                                             <div>
@@ -133,7 +133,7 @@
                                                 {{ $item['name'] }}
                                             </span>
                                             <span class="text-xs">
-                                                @if (array_key_exists('sides', $item) && $item['sides'])
+                                                @if (isset($item['sides']))
                                                     <ul>
                                                         @foreach ($item['sides'] as $side)
                                                             <li>
@@ -142,7 +142,7 @@
                                                         @endforeach
                                                     </ul>
                                                 @endif
-                                                {{ array_key_exists('desc', $item) ? "Desc: ".$item['desc'] : '' }}
+                                                {{ isset($item['desc']) ? "Desc: ".$item['desc'] : '' }}
                                             </span>
                                             <span>
                                                 {{ $item['note'] ? "\" ". $item['note'] ." \"" : '' }}

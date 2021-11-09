@@ -18,5 +18,4 @@ class Modal extends Component
         $this->isModalOpen = !$this->isModalOpen;
     }
 
-
 }

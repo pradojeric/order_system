@@ -95,9 +95,9 @@ class WaiterController extends Controller
             foreach($orders as $order){
 
                 if($order->isCheck()){
-                    $totalCheckPaid += $order->totalDiscountedPrice();
+                    $totalCheckPaid += $order->totalPrice();
                 }else{
-                    $totalCashPaid += $order->totalDiscountedPrice();
+                    $totalCashPaid += $order->totalPrice();
                 }
 
                 $totalDiscountCost += $order->totalDiscountedPrice();
@@ -133,7 +133,7 @@ class WaiterController extends Controller
                 }
             }
 
-            $totalSalesCost = $totalFoodsCost + $totalDrinksCost - $totalDiscountCost;
+            $totalSalesCost = $totalCheckPaid + $totalCashPaid - $totalDiscountCost;
 
 
             $totalFoods = new waiterItem("Total Foods", number_format($totalFoodsCost, 2, '.', ','));

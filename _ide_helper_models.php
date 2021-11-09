@@ -114,6 +114,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Cancel[] $cancel
  * @property-read int|null $cancel_count
+ * @property-read \App\Models\DiscountedItem|null $discountItem
  * @property-read \App\Models\Order $order
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish newQuery()
@@ -133,6 +134,58 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|CustomDish whereUpdatedAt($value)
  */
 	class CustomDish extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\Discount
+ *
+ * @property int $id
+ * @property string $type
+ * @property float|null $value
+ * @property string|null $name
+ * @property int $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Discount whereValue($value)
+ */
+	class Discount extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\DiscountedItem
+ *
+ * @property int $id
+ * @property string $discountable_type
+ * @property int $discountable_id
+ * @property int $discount_type
+ * @property int $items
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Discount $discountType
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $discountable
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem whereDiscountType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem whereDiscountableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem whereDiscountableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem whereItems($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DiscountedItem whereUpdatedAt($value)
+ */
+	class DiscountedItem extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -258,6 +311,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Cancel[] $cancel
  * @property-read int|null $cancel_count
+ * @property-read \App\Models\DiscountedItem|null $discountItem
  * @property-read \App\Models\Dish $dish
  * @property-read \App\Models\Order $order
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SideDish[] $sideDishes

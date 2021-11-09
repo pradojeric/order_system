@@ -53,4 +53,24 @@ class OrderDetails extends Model
     {
         return $this->dish->category->type == "foods";
     }
+
+    public function discountItem()
+    {
+        return $this->morphOne(DiscountedItem::class, 'discountable');
+    }
+
+    public function getPrice()
+    {
+        if($this->discountItem()->exists())
+        {
+            if ($this->discountItem->getDiscountType() === 'percent') {
+                return $this->attributes['price'] - ($this->attributes['price_per_piece'] * $this->discountItem->items * $this->discountItem->getDiscountValue() / 100);
+            }
+
+            if ($this->discountItem->getDiscountType() === 'fixed') {
+                return $this->attributes['price'] - ($this->discountItem->items * $this->discountItem->getDiscountValue());
+            }
+        }
+        return $this->attributes['price'];
+    }
 }

@@ -46,25 +46,25 @@
                     <div class="flex flex-grow overflow-y-auto border p-1.5">
                         <div class="w-full">
                             @foreach ($orderDetails as $i => $item)
-                            <div class="flex justify-between mb-1 text-sm w-full px-3">
-                                <div class="flex flex-col w-52">
-                                    <div class="flex flex-col">
-                                        <span>
-                                            {{ $item['name'] }}
-                                        </span>
-                                        <span class="text-xs">
-                                            {{ array_key_exists('side_dish', $item) && $item['side_dish'] ? 'with
-                                            '.$item['side_dish'] : '' }}
-                                        </span>
+                                <div class="flex justify-between mb-1 text-sm w-full px-3">
+                                    <div class="flex flex-col w-52">
+                                        <div class="flex flex-col">
+                                            <span>
+                                                {{ $item['name'] }}
+                                            </span>
+                                            <span class="text-xs">
+                                                {{ isset($item['side_dish']) ? 'with
+                                                '.$item['side_dish'] : '' }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            X{{ $item['quantity'] }}
+                                        </div>
                                     </div>
-                                    <div>
-                                        X{{ $item['quantity'] }}
+                                    <div class="flex items-end">
+                                        ₱ {{number_format( $item['price'], 2, '.', ',') }}
                                     </div>
                                 </div>
-                                <div class="flex items-end">
-                                    ₱ {{number_format( $item['price'], 2, '.', ',') }}
-                                </div>
-                            </div>
                             @endforeach
 
                         </div>
@@ -83,14 +83,14 @@
                         <!-- if Enable Discount -->
                         @if($enableDiscount)
 
-                        <div class="text-xs flex flex-row justify-between mb-2">
-                            <span>
-                                Discount:
-                            </span>
-                            <span>
-                                ({{ $discount }})
-                            </span>
-                        </div>
+                            <div class="text-xs flex flex-row justify-between mb-2">
+                                <span>
+                                    Discount:
+                                </span>
+                                <span>
+                                    ({{ $discount }})
+                                </span>
+                            </div>
                         @endif
                         <!-- End Enable Discount -->
 

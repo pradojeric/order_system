@@ -30,14 +30,16 @@
           To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       -->
             <div
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex-shrink-0 flex items-center justify-center mx-auto">
                         <!-- Heroicon name: outline/exclamation -->
                         {{ __('DISCOUNT') }}
                     </div>
                 </div>
-                <div class="px-4">
+
+                <div class="px-4 ">
+                    <x-auth-validation-errors />
                     Order #: {{ $order->order_number }}
 
                     <div class="flex flex-col mt-1 space-y-1">
@@ -49,33 +51,75 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col mt-1 space-y-1 bg-gray-100 p-2">
-                        <div class="flex justify-between">
-                            <span>
-                                Type:
-                            </span>
-                            <x-select class="h-8 w-80 text-xs" wire:model="discountType" :disabled="!$enableDiscount" >
-                                <option value="percent">{{ _('Percent') }}</option>
-                                <option value="fixed">{{ _('Fixed') }}</option>
-                            </x-select>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>
-                                Discount:
-                            </span>
-                            <x-input :disabled="!$enableDiscount"
-                                class="text-right w-80 text-xs p-2 {{ $errors->get('discount') ? 'border border-red-500' : '' }}"
-                                wire:model="discount" />
-                        </div>
-                        <div class="flex justify-between">
-                            <span>
-                                Description:
-                            </span>
-                            <textarea {{ !$enableDiscount ? 'disabled' : '' }}
-                                class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring
-                                focus:ring-indigo-200 focus:ring-opacity-50 resize-y w-80 text-xs p-2 {{ $errors->get('discountDescription') ? 'border border-red-500' : '' }}"
-                                wire:model="discountDescription"></textarea>
-                        </div>
+                    <div class="flex flex-col mt-1 space-y-1 p-2 bg-gray-100">
+
+                        @foreach ($order->orderDetails as $o)
+
+                            <div class="flex justify-between items-end mb-1 text-sm w-full">
+                                <div class="flex justify-between w-full px-3">
+                                    <div class="flex flex-col">
+                                        <div class="flex flex-col">
+                                            <span>
+                                                {{ $o->dish->name }}
+                                            </span>
+                                            <span class="text-xs">
+                                                <ul>
+                                                    @foreach ($o->sideDishes as $side)
+                                                        <li>with: {{ $side->dish->name }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            X{{ $o->pcs }}
+                                        </div>
+                                    </div>
+                                    <div class="flex items-end">
+                                        ₱ {{number_format( $o->getPrice(), 2, '.', ',') }}
+                                        <span class="line-through ml-1">
+                                            {{ $o->discountItem()->exists() ? number_format(
+                                            $o->price, 2, '.', ',') : '' }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="flex space-x-2 items-center">
+                                    <div>
+                                        <x-input type="text" class="text-xs" placeholder="Quantity to discount" :disabled=!$enableDiscount wire:model="discounts.{{ $o->id }}.def.items" />
+                                    </div>
+                                    <div>
+                                        <x-select class="text-xs" :disabled=!$enableDiscount wire:model="discounts.{{ $o->id }}.def.discountId" >
+                                            <option value="" selected>Select Discount</option>
+                                            @foreach ($allDiscounts as $d)
+                                                <option value="{{ $d->id }}">{{ $d->name }} ({{ $d->value }}{{ $d->type == "percent" ? "%" : '' }})</option>
+                                            @endforeach
+                                        </x-select>
+                                    </div>
+                                    <div class="flex space-x-2">
+
+                                        @if($o->discountItem)
+
+                                            <button class=" text-red-500 hover:text-red-300">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        @else
+                                            <button class="text-green-500 hover:text-green-300" wire:click="resetDiscount({{ $o->id }})">
+                                                <i class="fa fa-undo"></i>
+                                            </button>
+
+                                        @endif
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        @endforeach
+
+                        @foreach ($order->customOrderDetails as $c)
+
+                        @endforeach
+
                     </div>
 
 
