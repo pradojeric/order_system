@@ -36,7 +36,11 @@
                         {{ __('TRANSFER ORDER TO OTHER TABLE') }}
                     </div>
                 </div>
+                <div class="px-4">
+                    <x-auth-validation-errors />
+                </div>
                 <div class="flex flex-col space-y-2 mt-2">
+
                     <div class="px-4">
                         <x-select class="w-full" wire:model="newTable">
                             <option value="">Select Table</option>
