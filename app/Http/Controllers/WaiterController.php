@@ -147,8 +147,8 @@ class WaiterController extends Controller
             // $totalIncome = new waiterItem("Total Income", number_format($totalServiceChargeCost + $totalSalesCost - $totalDiscountCost, 2, '.', ','));
 
             // Enter the share name for your USB printer here
-            // $connector = new WindowsPrintConnector("POS-58-BAR");
-            $connector = new WindowsPrintConnector("POS-58");
+            $connector = new WindowsPrintConnector("POS-58-BAR");
+            // $connector = new WindowsPrintConnector("POS-58");
 
             /* Print a "Hello world" receipt" */
             $printer = new Printer($connector);
