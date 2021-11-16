@@ -99,7 +99,7 @@
 
                                         @if($o->discountItem)
 
-                                            <button class=" text-red-500 hover:text-red-300">
+                                            <button class=" text-red-500 hover:text-red-300" wire:click="deleteDiscount({{ $o->id }})">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         @else

@@ -84,14 +84,19 @@ class Order extends Model
         // }
 
         // return $total;
-        $customPrices = $this->customOrderDetails->sum(function($item){
-            return $item->getPrice();
-        });
-        $orderPrices = $this->orderDetails->sum(function($item){
-            return $item->getPrice();
-        });
+        if($this->enable_discount){
+            $customPrices = $this->customOrderDetails->sum(function($item){
+                return $item->getPrice();
+            });
+            $orderPrices = $this->orderDetails->sum(function($item){
+                return $item->getPrice();
+            });
 
-        return $customPrices + $orderPrices;
+            return $customPrices + $orderPrices;
+        }
+
+        return $this->totalPriceWithoutDiscount();
+
     }
 
     public function totalPriceWithServiceCharge()

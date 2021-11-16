@@ -214,7 +214,8 @@ class OrderController extends Controller
             $totalDiscounted = new receiptItem('Total' , number_format($order->totalPriceWithServiceCharge(), 2, '.', ','));
 
             // Enter the share name for your USB printer here
-            $connector = new WindowsPrintConnector("POS-58-BAR");
+            $connector = new WindowsPrintConnector("POS-58");
+            // $connector = new WindowsPrintConnector("POS-58-BAR");
 
             /* Print a "Hello world" receipt" */
             $printer = new Printer($connector);
@@ -260,6 +261,7 @@ class OrderController extends Controller
             $printer->text($date . "\n");
             $printer->text("Server: " . $order->waiter->full_name . "\n");
 
+            $printer->feed(3);
             $printer->cut();
 
             /* Close printer */
@@ -297,7 +299,8 @@ class OrderController extends Controller
             $totalDiscounted = new receiptItem('Total' , number_format($order->totalPriceWithServiceCharge(),2, '.', ','));
 
             // Enter the share name for your USB printer here
-            $connector = new WindowsPrintConnector("POS-58-BAR");
+            // $connector = new WindowsPrintConnector("POS-58-BAR");
+            $connector = new WindowsPrintConnector("POS-58");
 
             /* Print a "Hello world" receipt" */
             $printer = new Printer($connector);

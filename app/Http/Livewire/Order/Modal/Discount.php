@@ -7,6 +7,7 @@ use App\Http\Livewire\Modal;
 use App\Events\OrderUpdatedEvent;
 use App\Models\Discount as DiscountModel;
 use App\Models\DiscountedItem;
+use App\Models\OrderDetails;
 use Exception;
 
 class Discount extends Modal
@@ -145,7 +146,12 @@ class Discount extends Modal
 
     public function deleteDiscount($id)
     {
-        DiscountedItem::find($id)->delete();
+
+        $oDetail = OrderDetails::find($id);
+        $oDetail->discountItem()->delete();
+
+        unset($this->discounts[$id]);
+        event(new OrderUpdatedEvent($this->order));
     }
 
     public function close()

@@ -133,7 +133,7 @@ class WaiterController extends Controller
                 }
             }
 
-            $totalSalesCost = $totalCheckPaid + $totalCashPaid - $totalDiscountCost;
+            $totalSalesCost = $totalCheckPaid + $totalCashPaid;
 
 
             $totalFoods = new waiterItem("Total Foods", number_format($totalFoodsCost, 2, '.', ','));
@@ -147,7 +147,8 @@ class WaiterController extends Controller
             // $totalIncome = new waiterItem("Total Income", number_format($totalServiceChargeCost + $totalSalesCost - $totalDiscountCost, 2, '.', ','));
 
             // Enter the share name for your USB printer here
-            $connector = new WindowsPrintConnector("POS-58-BAR");
+            // $connector = new WindowsPrintConnector("POS-58-BAR");
+            $connector = new WindowsPrintConnector("POS-58");
 
             /* Print a "Hello world" receipt" */
             $printer = new Printer($connector);
@@ -166,8 +167,16 @@ class WaiterController extends Controller
             $length = 60;
             $printer->setEmphasis(true);
             $printer->text("Daily Report\n");
+
+            if($endDate != null)
+            {
+                $printer->text($startDate." - ".$endDate);
+            }else{
+                $printer->text($startDate);
+            }
             $printer->text($waiterName."\n");
             $printer->setEmphasis(false);
+            $printer->feed();
             $printer->text("Total Pax: ".$totalPax);
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -194,6 +203,7 @@ class WaiterController extends Controller
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text($date . "\n");
 
+            $printer->feed(3);
             $printer->cut();
 
             /* Close printer */
