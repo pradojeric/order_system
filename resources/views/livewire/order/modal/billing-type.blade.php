@@ -42,9 +42,9 @@
                 </div>
                 <div class="flex justify-center space-x-2">
                     <x-input id="single" type="radio" wire:model.lazy="billingType" value="single" />
-                    <x-label for="single" :value="_('Single')" />
+                    <x-label for="single" :value="__('Single')" />
                     <x-input id="multiple" type="radio" wire:model.lazy="billingType" value="multiple" />
-                    <x-label for="multiple" :value="_('Multiple')" />
+                    <x-label for="multiple" :value="__('Multiple')" />
                 </div>
                 @if($billingType == "multiple")
                 <div class="px-4 mt-2">

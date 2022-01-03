@@ -107,51 +107,51 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($orders as $order)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                                {{ $order->order_number }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                                <ul class="list-disc">
-                                    @foreach ($order->orderDishes() as $item)
-                                    <li class="text-xs">{{ $item['dish_name'] }} ({{ $item['qty'] }})</li>
-                                    @endforeach
-                                </ul>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                                {{ $order->pax }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                                {{ $order->action }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                                {{ $order->waiter->full_name }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                {{ '₱ '. number_format($order->totalPriceWithServiceCharge(), 2, '.', ',') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $order->discount_option }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ '₱ '. number_format($order->cash, 2, '.', ',') }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
-                                {{ $order->ref_no }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                ₱ {{ number_format($order->change, 2, '.', ',') }}
-                            </td>
-                            <td class="px-6 py-4">
-                                <!-- <button onclick="event.preventDefault(); print({{ $order->id }})"> -->
-                                <button x-on:click="print({{$order->id}})">
-                                    <i class="fa fa-print"></i>
-                                </button>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                                    {{ $order->order_number }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                                    <ul class="list-disc">
+                                        @foreach ($order->orderDishes() as $item)
+                                        <li class="text-xs">{{ $item['dish_name'] }} ({{ $item['qty'] }})</li>
+                                        @endforeach
+                                    </ul>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                                    {{ $order->pax }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                                    {{ $order->action }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                                    {{ $order->waiter->full_name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    {{ '₱ '. number_format($order->totalPriceWithServiceCharge(), 2, '.', ',') }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $order->discount_option }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ '₱ '. number_format($order->cash, 2, '.', ',') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                                    {{ $order->ref_no }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    ₱ {{ number_format($order->change, 2, '.', ',') }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <!-- <button onclick="event.preventDefault(); print({{ $order->id }})"> -->
+                                    <button x-on:click="print({{$order->id}})">
+                                        <i class="fa fa-print"></i>
+                                    </button>
+                                </td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="9" class="text-center text-sm text-red-500 py-4">No records</td>
-                        </tr>
+                            <tr>
+                                <td colspan="9" class="text-center text-sm text-red-500 py-4">No records</td>
+                            </tr>
 
                         @endforelse
                     </tbody>
@@ -301,7 +301,7 @@
                                 <button type="button"
                                     x-on:click="printPerWaiter({{$waiter->id}})">
                                 <!-- onclick="event.preventDefault(); printPerWaiter({{ $waiter->id }})" > -->
-                                    
+
                                     <i class="fa fa-print"></i>
                                 </button>
                             </td>
@@ -314,7 +314,7 @@
 
     </div>
 
-   
+
 
 </div>
 

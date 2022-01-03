@@ -21,6 +21,8 @@ class Discount extends Modal
     public $allDiscounts;
     public $discounts = [];
 
+    public $discountSettings;
+
     protected $rules = [
         'discounts.*.*.items' => 'nullable',
         'discounts.*.*.discountId' => 'nullable',
@@ -44,30 +46,43 @@ class Discount extends Modal
     {
 
         $this->enableDiscount = $this->order->enable_discount;
-        // $this->discountType = $this->order->discount_type;
-        // $this->discount = $this->order->discount;
-        // $this->discountDescription = $this->order->discount_ref;
 
-        foreach($this->order->orderDetails as $d)
+        if($this->enableDiscount)
         {
+            $this->discountSettings = $this->order->discount_settings;
 
-            if($d->discountItem()->exists())
+            if($this->order->discount_settings == 'whole')
             {
 
-                $this->discounts[$d->id]['def']['items'] = $d->discountItem->items;
-                $this->discounts[$d->id]['def']['discountId'] = $d->discountItem->discount_type;
+                $this->discountType = $this->order->discount_type;
+                $this->discount = $this->order->discount;
+                $this->discountDescription = $this->order->discount_ref;
             }
 
-        }
-
-        foreach($this->order->customOrderDetails as $c)
-        {
-            if($c->discountItem()->exists())
+            if($this->order->discount_settings == 'per_item')
             {
-                $this->discounts[$c->id]['custom']['items'] = $c->discountItem->items;
-                $this->discounts[$c->id]['custom']['discountId'] = $c->discountItem->discount_type;
-            }
+                foreach($this->order->orderDetails as $d)
+                {
 
+                    if($d->discountItem()->exists())
+                    {
+
+                        $this->discounts[$d->id]['def']['items'] = $d->discountItem->items;
+                        $this->discounts[$d->id]['def']['discountId'] = $d->discountItem->discount_type;
+                    }
+
+                }
+
+                foreach($this->order->customOrderDetails as $c)
+                {
+                    if($c->discountItem()->exists())
+                    {
+                        $this->discounts[$c->id]['custom']['items'] = $c->discountItem->items;
+                        $this->discounts[$c->id]['custom']['discountId'] = $c->discountItem->discount_type;
+                    }
+
+                }
+            }
         }
 
         $this->toggleModal();
@@ -76,17 +91,28 @@ class Discount extends Modal
 
     public function saveDiscount()
     {
-        // $this->order->update([
-        //     'enable_discount' => $this->enableDiscount ?? false,
-        //     'discount_type' => $this->enableDiscount ? $this->discountType : 'percent',
-        //     'discount' => $this->enableDiscount ? $this->discount : null,
-        //     'discount_ref' => $this->enableDiscount ? $this->discountDescription : null,
-        // ]);
 
         try{
 
-            if($this->enableDiscount)
+            if($this->discountSettings == 'whole')
             {
+                $this->order->update([
+                    'enable_discount' => $this->enableDiscount ?? false,
+                    'discount_type' => $this->enableDiscount ? $this->discountType : 'percent',
+                    'discount' => $this->enableDiscount ? $this->discount : null,
+                    'discount_ref' => $this->enableDiscount ? $this->discountDescription : null,
+                    'discount_settings' => $this->discountSettings,
+                ]);
+
+            }
+
+            if($this->discountSettings == 'per_item')
+            {
+                $this->order->update([
+                    'enable_discount' => $this->enableDiscount ?? false,
+                    'discount_settings' => $this->discountSettings,
+                ]);
+
                 foreach($this->order->orderDetails as $d)
                 {
                     if(isset($this->discounts[$d->id]['def']))
@@ -119,15 +145,6 @@ class Discount extends Modal
                     }
                 }
             }
-            else
-            {
-
-            }
-
-
-            $this->order->update([
-                'enable_discount' => $this->enableDiscount ?? false,
-            ]);
 
             event(new OrderUpdatedEvent($this->order));
 
@@ -146,7 +163,6 @@ class Discount extends Modal
 
     public function deleteDiscount($id)
     {
-
         $oDetail = OrderDetails::find($id);
         $oDetail->discountItem()->delete();
 
@@ -156,6 +172,7 @@ class Discount extends Modal
 
     public function close()
     {
+        $this->discountSettings = '';
         $this->toggleModal();
     }
 

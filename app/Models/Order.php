@@ -85,12 +85,32 @@ class Order extends Model
 
         // return $total;
         if($this->enable_discount){
-            $customPrices = $this->customOrderDetails->sum(function($item){
-                return $item->getPrice();
-            });
-            $orderPrices = $this->orderDetails->sum(function($item){
-                return $item->getPrice();
-            });
+            if($this->discount_settings == 'whole')
+            {
+                $total =  $this->totalPriceWithoutDiscount();
+
+                if ($this->discount_type === 'percent') {
+                    $total = $total - ($total * $this->discount / 100);
+                }
+
+                if ($this->discount_type === 'fixed') {
+                    $total = $total - $this->discount;
+                }
+
+                return $total;
+            }
+
+            if($this->discount_settings == 'per_item')
+            {
+                $customPrices = $this->customOrderDetails->sum(function($item){
+                    return $item->getPrice();
+                });
+                $orderPrices = $this->orderDetails->sum(function($item){
+                    return $item->getPrice();
+                });
+            }
+
+
 
             return $customPrices + $orderPrices;
         }
