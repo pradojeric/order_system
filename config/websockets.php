@@ -27,8 +27,6 @@ return [
             'name' => env('APP_NAME'),
             'key' => env('PUSHER_APP_KEY'),
             'secret' => env('PUSHER_APP_SECRET'),
-            'path' => env('PUSHER_APP_PATH'),
-            'capacity' => null,
             'enable_client_messages' => false,
             'enable_statistics' => true,
         ],
@@ -105,10 +103,6 @@ return [
         'perform_dns_lookup' => false,
     ],
 
-    /*
-     * Define the optional SSL context for your WebSocket connections.
-     * You can see all available options at: http://php.net/manual/en/context.ssl.php
-     */
     'ssl' => [
         /*
          * Path to local certificate file on filesystem. It must be a PEM encoded file which
@@ -125,9 +119,11 @@ return [
         'local_pk' => env('LARAVEL_WEBSOCKETS_SSL_LOCAL_PK', null),
 
         /*
-         * Passphrase for your local_cert file.
+         * Passphrase with which your local_cert file was encoded.
          */
-        'passphrase' => env('LARAVEL_WEBSOCKETS_SSL_PASSPHRASE', null),
+        'passphrase' => null,
+
+        'verify_peer' => false,
     ],
 
     /*
