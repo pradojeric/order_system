@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\Order;
 use App\Models\Table;
-use App\Models\Configuration;
-use Carbon\Carbon;
 use Mike42\Escpos\Printer;
-use Illuminate\Http\Request;
+use App\Models\Configuration;
 use Illuminate\Support\Facades\DB;
+use Mike42\Escpos\CapabilityProfile;
+use Mike42\Escpos\PrintConnectors\RawbtPrintConnector;
+use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 
 class OrderController extends Controller
@@ -119,7 +120,8 @@ class OrderController extends Controller
 
                 // Enter the share name for your USB printer here
                 //$connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
-                $connector1 = new WindowsPrintConnector("POS-58");
+                // $connector1 = new WindowsPrintConnector("POS-58");
+                $connector1 = new NetworkPrintConnector('192.168.100.5', 9100);
 
                 /* Print a "Hello world" receipt" */
                 $printer = new Printer($connector1);
@@ -188,6 +190,112 @@ class OrderController extends Controller
             echo "Couldn't print to this printer: " . $e->getMessage() . "\n";
             DB::rollback();
         }
+    }
+
+
+    public function printKitchen(Order $order, $reprint = 0)
+    {
+
+        try {
+
+            DB::beginTransaction();
+
+            $date = now()->toDateTimeString();
+            $foods = [];
+            $new = [];
+            foreach ($order->orderDetails as $i) {
+
+                // if($i->printed == false){
+                    $description = '';
+
+
+                    if($i->isFood()){
+                        $dishName = $i->dish->name;
+                        if($i->sideDishes) {
+                            foreach($i->sideDishes as $side){
+                                $description .= "\n side: ".$side->dish->name;
+                            }
+                        }
+
+                        $foods[] = new item($dishName, $i->pcs, $description, $i->note);
+
+                    }
+
+                    $new[] = $i->id;
+                    $i->printed = true;
+                    $i->save();
+                // }
+
+            }
+
+
+            $newc = [];
+            foreach ($order->customOrderDetails as $c) {
+                // if($c->printed == false){
+                    $itemName = $c->name;
+
+                    if($c->isFood()){
+                        $foods[] = new item($itemName, $c->pcs, $c->description);
+                    }
+                    $c->printed = true;
+                    $c->save();
+                    $newc[] = $c->id;
+                // }
+            }
+
+
+            $length = 60;
+
+            if(count($foods) > 0) {
+
+                // Enter the share name for your USB printer here
+                //$connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
+                $profile = CapabilityProfile::load("POS-5890");
+                // $connector1 = new RawbtPrintConnector();
+                $connector1 = new NetworkPrintConnector('192.168.100.5', 9100);
+
+                /* Print a "Hello world" receipt" */
+                $printer = new Printer($connector1, $profile);
+                $printer->initialize();
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->setEmphasis(true);
+                $printer->text("Kitchen\n");
+                $printer->text("Order Number: " . $order->order_number . "\n");
+                $printer->text($order->table()->name ?? '');
+                $printer->setEmphasis(false);
+                $printer->text("\n");
+                $printer->text($order->action . "\n");
+                $printer->text($date . "\n");
+                $printer->text("Server: " . $order->waiter->full_name . "\n");
+                $printer->feed(2);
+                $printer->setJustification(Printer::JUSTIFY_LEFT);
+
+                foreach ($foods as $o) {
+                    $printer->text($o->getAsString($length));
+                }
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->text('---------------------');
+
+                $printer->feed(4);
+
+                $printer->cut();
+
+                $printer->close();
+            }
+
+            DB::commit();
+
+        } catch (Exception $e) {
+            DB::rollback();
+        }
+
+        // // $connector = new RawbtPrintConnector();
+        // $connector = new NetworkPrintConnector('192.168.100.5', 9100);
+        // $profile = CapabilityProfile::load("POS-5890");
+        // $printer = new Printer($connector, $profile);
+        // $printer -> text("Hello world!\n");
+        // $printer -> cut();
+        // $printer->close();
     }
 
     public function printBill(Order $order)

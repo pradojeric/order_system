@@ -28,6 +28,7 @@
             <div class="flex h-full">
                 <div class="w-64 p-2">
                     @if($hasOrder)
+
                     <div>
                         <a href="{{ route('orders.show', ['action' => 'dine_in', 'tableId' => $table->id, 'order' => $table->order()]) }}">
                             <ul class="list-unstyled text-xs">
