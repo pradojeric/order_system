@@ -60,6 +60,16 @@
                                 <x-button class="ml-3">Edit</x-button>
                             </form>
                         </div>
+                        <div class="px-6 py-3">
+                            <form action="/admin/network-printer-update" method="post">
+                                @csrf
+                                @method('put')
+                                <x-label for="network_printer">{{ __('Edit Network Printer') }}</x-label>
+                                <x-input type="text" class="w-52" min="0" max="100" id="network_printer" name="network_printer"
+                                    :value="$config->network_printer" />
+                                <x-button class="ml-3">Edit</x-button>
+                            </form>
+                        </div>
                     </div>
                     <div class="px-6 py-3 flex-grow">
                             @livewire('admin.discount-settings')

@@ -73,4 +73,19 @@ class OrderDetails extends Model
         }
         return $this->attributes['price'];
     }
+
+    public function getDiscount()
+    {
+        if($this->discountItem()->exists())
+        {
+            if ($this->discountItem->getDiscountType() === 'percent') {
+                return ($this->attributes['price_per_piece'] * $this->discountItem->items * $this->discountItem->getDiscountValue() / 100);
+            }
+
+            if ($this->discountItem->getDiscountType() === 'fixed') {
+                return ($this->discountItem->items * $this->discountItem->getDiscountValue());
+            }
+        }
+        return "HEllo";
+    }
 }

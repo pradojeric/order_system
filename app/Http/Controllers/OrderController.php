@@ -63,7 +63,7 @@ class OrderController extends Controller
     public function printReceipt(Order $order, $reprint = 0)
     {
         try {
-
+            $config = Configuration::first();
             DB::beginTransaction();
 
             $date = now()->toDateTimeString();
@@ -121,7 +121,7 @@ class OrderController extends Controller
                 // Enter the share name for your USB printer here
                 //$connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
                 // $connector1 = new WindowsPrintConnector("POS-58");
-                $connector1 = new NetworkPrintConnector('192.168.100.5', 9100);
+                $connector1 = new NetworkPrintConnector($config->network_printer, 9100);
 
                 /* Print a "Hello world" receipt" */
                 $printer = new Printer($connector1);
@@ -252,7 +252,7 @@ class OrderController extends Controller
                 //$connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
                 $profile = CapabilityProfile::load("POS-5890");
                 // $connector1 = new RawbtPrintConnector();
-                $connector1 = new NetworkPrintConnector('192.168.100.5', 9100);
+                $connector1 = new NetworkPrintConnector(Configuration::first()->network_printer, 9100);
 
                 /* Print a "Hello world" receipt" */
                 $printer = new Printer($connector1, $profile);
@@ -287,6 +287,7 @@ class OrderController extends Controller
 
         } catch (Exception $e) {
             DB::rollback();
+            echo "Couldn't print to this printer: " . $e->getMessage() . "\n";
         }
 
         // // $connector = new RawbtPrintConnector();
@@ -305,11 +306,11 @@ class OrderController extends Controller
 
             $items = [];
             foreach ($order->orderDetails as $i) {
-                $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','), number_format($i->getDiscount(), 2, '.', ','));
             }
 
             foreach ($order->customOrderDetails as $i) {
-                $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','), number_format($i->getDiscount(), 2, '.', ','));
             }
             $config = Configuration::first();
             if($order->action == "Dine In")
@@ -325,8 +326,13 @@ class OrderController extends Controller
             // $connector = new WindowsPrintConnector("POS-58");
             $connector = new WindowsPrintConnector("POS-58-BAR");
 
+            // For Network USB Printer
+            // $profile = CapabilityProfile::load("POS-5890");
+            // $connector = new NetworkPrintConnector('192.168.100.5', 9100);
+
             /* Print a "Hello world" receipt" */
             $printer = new Printer($connector);
+            // $printer = new Printer($connector, $profile);
             $printer->initialize();
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->setEmphasis(true);
@@ -387,11 +393,11 @@ class OrderController extends Controller
             $date = now()->toDateTimeString();
             $items = [];
             foreach ($order->orderDetails as $i) {
-                $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','), number_format($i->getDiscount(), 2, '.', ','));
             }
 
             foreach ($order->customOrderDetails as $i) {
-                $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','));
+                $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','), number_format($i->getDiscount(), 2, '.', ','));
             }
 
             $config = Configuration::first();
@@ -527,12 +533,14 @@ class receiptItem
     private $name;
     private $price;
     private $pesoSign;
+    private $discount;
 
-    public function __construct($name = '', $price = '', $pesoSign = false)
+    public function __construct($name = '', $price = '', $discount = '', $pesoSign = false)
     {
         $this->name = $name;
         $this->price = $price;
         $this->pesoSign = $pesoSign;
+        $this->discount = $discount;
     }
 
     public function getAsString($width = 30)
@@ -543,10 +551,16 @@ class receiptItem
             $leftCols = $leftCols / 2 - $rightCols / 2;
         }
         $left = str_pad($this->name, $leftCols);
+        $discount = '';
 
         $sign = ($this->pesoSign ? 'P ' : '');
         $right = str_pad($sign . $this->price, $rightCols, ' ', STR_PAD_LEFT);
-        return "$left$right\n";
+
+        if($this->discount) {
+            $discount = "\n".str_pad("(".$this->discount.")", $width/2, ' ', STR_PAD_LEFT);
+        }
+
+        return "$left$right$discount\n";
     }
 
     public function __toString()

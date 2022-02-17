@@ -63,4 +63,13 @@ class ConfigurationController extends Controller
 
         return back()->with('message', 'Successfully updated take out charge');
     }
+
+    public function editNetworkPrinter(Request $request)
+    {
+        $this->config->update([
+            'network_printer'=> $request->network_printer,
+        ]);
+
+        return back()->with('message', 'Successfully updated network printer');
+    }
 }

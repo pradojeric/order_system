@@ -105,6 +105,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/tin-number-update', [ConfigurationController::class, 'editTinNo']);
         Route::put('/tip-update', [ConfigurationController::class, 'editTip']);
         Route::put('/take-out-charge-update', [ConfigurationController::class, 'editTakeOutCharge']);
+        Route::put('/network-printer-update', [ConfigurationController::class, 'editNetworkPrinter']);
 
         Route::delete('/dishes/deactivate/{dish}', [DishController::class, 'deactivate'])->name('dishes.deactivate');
         Route::get('/dishes/restore/{dish}', [DishController::class, 'restore'])->name('dishes.restore');
