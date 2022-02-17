@@ -30,7 +30,7 @@
           To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       -->
             <div
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="flex-shrink-0 flex items-center justify-center mx-auto">
                         <!-- Heroicon name: outline/exclamation -->
@@ -141,6 +141,9 @@
                                                         <option value="{{ $d->id }}">{{ $d->name }} ({{ $d->value }}{{ $d->type == "percent" ? "%" : '' }})</option>
                                                     @endforeach
                                                 </x-select>
+                                            </div>
+                                            <div>
+                                                <x-input type="text" class="text-xs" placeholder="Discount Description" :disabled=!$enableDiscount wire:model="discounts.{{ $o->id }}.def.discount_details" />
                                             </div>
                                             <div class="flex space-x-2">
 

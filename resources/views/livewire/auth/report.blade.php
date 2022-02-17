@@ -130,7 +130,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     {{ '₱ '. number_format($order->totalPriceWithServiceCharge(), 2, '.', ',') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $order->discount_option }}
+                                    {{ '₱ '. $order->discount_option }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ '₱ '. number_format($order->cash, 2, '.', ',') }}

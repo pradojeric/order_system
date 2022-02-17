@@ -26,6 +26,7 @@ class Discount extends Modal
     protected $rules = [
         'discounts.*.*.items' => 'nullable',
         'discounts.*.*.discountId' => 'nullable',
+        'discounts.*.*.discount_details' => 'nullable',
     ];
 
     public function mount(Order $order)
@@ -69,6 +70,7 @@ class Discount extends Modal
 
                         $this->discounts[$d->id]['def']['items'] = $d->discountItem->items;
                         $this->discounts[$d->id]['def']['discountId'] = $d->discountItem->discount_type;
+                        $this->discounts[$d->id]['def']['discount_details'] = $d->discountItem->discount_details;
                     }
 
                 }
@@ -79,6 +81,7 @@ class Discount extends Modal
                     {
                         $this->discounts[$c->id]['custom']['items'] = $c->discountItem->items;
                         $this->discounts[$c->id]['custom']['discountId'] = $c->discountItem->discount_type;
+                        $this->discounts[$c->id]['custom']['discount_details'] = $c->discountItem->discount_details;
                     }
 
                 }
@@ -124,6 +127,7 @@ class Discount extends Modal
                             [
                             'discount_type' => $this->discounts[$d->id]['def']['discountId'],
                             'items' => $this->discounts[$d->id]['def']['items'],
+                            'discount_details' => $this->discounts[$d->id]['def']['discount_details'],
                         ]
                     );
                     }
@@ -140,6 +144,7 @@ class Discount extends Modal
                             [
                             'discount_type' => $this->discounts[$c->id]['custom']['discountId'],
                             'items' => $this->discounts[$c->id]['custom']['items'],
+                            'discount_details' => $this->discounts[$c->id]['custom']['discount_details'],
                         ]
                     );
                     }
