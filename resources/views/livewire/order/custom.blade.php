@@ -38,12 +38,12 @@
                 </div>
                 <form wire:submit.prevent="addCustomDish" class="space-y-3">
                     <div class="flex flex-col px-4">
-                        <x-label for="customDish">{{ _('Dish Name') }}</x-label>
+                        <x-label for="customDish">{{ __('Dish Name') }}</x-label>
                         <x-input type="text" class="w-full" wire:model="customDish" id="customDish" required />
                         @error('customDish') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                     </div>
                     <div class="flex flex-col px-4">
-                        <x-label for="customDescription">{{ _('Dish Description') }}</x-label>
+                        <x-label for="customDescription">{{ __('Dish Description') }}</x-label>
                         <x-textarea type="text" class="w-full" wire:model="customDescription" id="customDescription"
                             required />
                         @error('customDescription') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
@@ -59,12 +59,12 @@
                         @error('customType') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                     </div>
                     <div class="flex flex-col px-4">
-                        <x-label for="customPrice">{{ _('Dish Price') }}</x-label>
+                        <x-label for="customPrice">{{ __('Dish Price') }}</x-label>
                         <x-input type="number" class="w-full" wire:model="customPrice" id="customPrice" required />
                         @error('customPrice') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                     </div>
                     <div class="flex flex-col px-4">
-                        <x-label for="customPcs">{{ _('Dish Quantity') }}</x-label>
+                        <x-label for="customPcs">{{ __('Dish Quantity') }}</x-label>
                         <x-input type="number" class="w-full" wire:model="customPcs" id="customPcs" required />
                         @error('customPcs') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                     </div>

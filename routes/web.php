@@ -76,6 +76,11 @@ Route::middleware('guest')->post('/login-passcode', [WaiterController::class, 'l
 
 
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/test-vue-livewire', function () {
+        return view('test');
+    });
+
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::put('/users/edit-profile', [UserController::class, 'editProfile'])->name('edit-profile');
     Route::get('/waiter-order', [WaiterController::class, 'waiterOrder']);

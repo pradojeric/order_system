@@ -4036,6 +4036,8 @@ module.exports = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _fortawesome_fontawesome_free_js_all_min__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @fortawesome/fontawesome-free/js/all.min */ "./node_modules/@fortawesome/fontawesome-free/js/all.min.js");
 /* harmony import */ var _fortawesome_fontawesome_free_js_all_min__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_fortawesome_fontawesome_free_js_all_min__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var livewire_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! livewire-vue */ "./node_modules/livewire-vue/dist/livewire-vue.js");
+/* harmony import */ var livewire_vue__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(livewire_vue__WEBPACK_IMPORTED_MODULE_1__);
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/alpine.js");
@@ -4044,6 +4046,13 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
 
 console.log(moment().format());
 
+
+window.Vue = Vue; //this is important! Do not use require('vue')
+
+Vue.component('example-component', (__webpack_require__(/*! ./components/Example.vue */ "./resources/js/components/Example.vue")["default"]));
+var app = new Vue({
+  el: '#app'
+});
 
 /***/ }),
 
@@ -5664,6 +5673,22 @@ var Echo = /*#__PURE__*/function () {
 }();
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Echo);
+
+
+/***/ }),
+
+/***/ "./node_modules/livewire-vue/dist/livewire-vue.js":
+/*!********************************************************!*\
+  !*** ./node_modules/livewire-vue/dist/livewire-vue.js ***!
+  \********************************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function(e){ true?!(__WEBPACK_AMD_DEFINE_FACTORY__ = (e),
+		__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+		(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+		__WEBPACK_AMD_DEFINE_FACTORY__),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):0}((function(){"use strict";if(void 0===window.livewire)throw"Livewire Vue Plugin: window.livewire is undefined. Make sure @livewireScripts is placed above this script include";window.livewire.hook("message.received",(e,i)=>{if(!window.Vue)return;if(!e.response.effects.html)return;const n=document.createElement("div");n.innerHTML=e.response.effects.html,(new window.Vue).$mount(n.firstElementChild),e.response.effects.html=n.firstElementChild.outerHTML}),window.livewire.hook("element.initialized",e=>{e.__vue__&&(e.__livewire_ignore=!0)}),window.livewire.hook("interceptWireModelSetValue",(e,i)=>{if(!i.__vue__)return;const n=window.Vue.config.silent;window.Vue.config.silent=!0,i.__vue__.$props.value=e,window.Vue.config.silent=n}),window.livewire.hook("interceptWireModelAttachListener",(e,i,n,t)=>{if(!e.__vue__)return;const o=i.modifiers.includes("debounce"),r=i.modifiers.includes("lazy");e.__vue__.$on("input",t(o||!r,e=>{const t=i.value,o=e;n.set(t,o)},i.durationOr(150)))})}));
+//# sourceMappingURL=livewire-vue.js.map
 
 
 /***/ }),
@@ -49090,6 +49115,16 @@ runtime.setup(pusher_Pusher);
 /******/ ]);
 });
 //# sourceMappingURL=pusher.js.map
+
+/***/ }),
+
+/***/ "./resources/js/components/Example.vue":
+/*!*********************************************!*\
+  !*** ./resources/js/components/Example.vue ***!
+  \*********************************************/
+/***/ (() => {
+
+
 
 /***/ }),
 

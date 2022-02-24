@@ -23,7 +23,7 @@
                                 <div wire:key="{{ $dish->id }}" class="flex border justify-between items-center py-3 pl-2 pr-3 text-xs lg:text-sm @if(!$dish->status) text-gray-300 @endif">
                                     <div class="flex items-center">
                                         <button type="button" wire:click.prevent.lazy="decrementQuantity({{ $index }})"><i class="fa fa-minus"></i></button>
-                                        <x-input type="number" min="1" class="w-12 mx-2" wire:model="dishes.{{ $index }}.quantity" readonly />
+                                        <x-input type="number" min="1" class="w-12 mx-2" wire:model.defer="dishes.{{ $index }}.quantity" readonly />
                                         <button type="button" wire:click.prevent.lazy="incrementQuantity({{ $index }})"><i class="fa fa-plus"></i></button>
                                     </div>
                                     <div class="flex justify-between w-1/2">
@@ -81,7 +81,7 @@
                         <div class="overflow-y-auto border rounded-lg p-1.5 w-full flex-grow">
                             @if($order)
                                 @foreach ($oldOrders as $i => $item)
-                                    <div class="flex justify-around mb-5 xl:text-sm text-xs" wire:model="oldOrders.{{ $i }}">
+                                    <div class="flex justify-around mb-5 xl:text-sm text-xs" wire:model.defer="oldOrders.{{ $i }}">
                                         <button type="button" class="w-5"
                                             {{-- wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $item->id }}, 0)" --}}
                                             wire:click.prevent="$emitTo('order.modal.cancel', 'cancelDish', {{ $item->id }} , 0)" >

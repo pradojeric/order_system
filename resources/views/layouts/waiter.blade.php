@@ -27,12 +27,12 @@
 
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 
 </head>
 
 <body class="font-sans antialiased">
-    <div class="bg-gray-100 min-h-screen">
+    <div class="bg-gray-100 min-h-screen" id="app">
         {{ $navbar }}
 
         <!-- Page Content -->
