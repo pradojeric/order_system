@@ -36,7 +36,7 @@
         </footer>
     </body>
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
     @livewireScripts
+    <script src="{{ asset('js/app.js') }}"></script>
     {{ $script ?? null }}
 </html>

@@ -15,6 +15,7 @@ use App\Http\Controllers\WaiterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigurationController;
 use App\Events\PrintKitchenEvent;
+use App\Http\Livewire\Test;
 use App\Models\OrderDetails;
 
 /*
@@ -77,9 +78,7 @@ Route::middleware('guest')->post('/login-passcode', [WaiterController::class, 'l
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/test-vue-livewire', function () {
-        return view('test');
-    });
+    Route::get('/test-vue-livewire', Test::class);
 
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::put('/users/edit-profile', [UserController::class, 'editProfile'])->name('edit-profile');

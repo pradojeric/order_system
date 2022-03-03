@@ -5,7 +5,7 @@
                 <div class="flex flex-col w-full">
                     <div class="grid grid-cols-3 md:grid-cols-5">
                         @foreach ($categories as $category)
-                            <x-menu-card :img="asset($category->icon)" :category="$category"
+                            <x-menu-card :img="asset($category->icon)" :category="$category->name"
                                 wire:click.prevent="viewDishes({{ $category->id ?? null }})"
                                 class="{{ $selectedCategory == $category->id ? 'border-green-500' : '' }}" />
                         @endforeach
