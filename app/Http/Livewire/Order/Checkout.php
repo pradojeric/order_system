@@ -9,6 +9,7 @@ use App\Http\Livewire\Modal;
 use App\Models\OrderReceipt;
 use App\Models\Configuration;
 use App\Events\OrderUpdatedEvent;
+use Illuminate\Support\Facades\DB;
 use App\Events\AnyOrderUpdatedEvent;
 use Illuminate\Support\Facades\Auth;
 
@@ -110,17 +111,6 @@ class Checkout extends Modal
         $this->totalPrice = $this->order->totalPrice() + $this->serviceCharge;
     }
 
-    public function computeChange()
-    {
-        if(strlen($this->cash) >= 10)
-        {
-            $this->addError('cash', 'Max length exceeded. Maximum: 10 digits');
-            return;
-        }
-
-        $this->resetErrorBag();
-        (float)$this->change = (float)$this->cash - (float)$this->totalPrice;
-    }
 
     public function updatingRefNo($value)
     {
@@ -149,46 +139,50 @@ class Checkout extends Modal
             }
         }
 
-        if (count($this->order->tables) > 0) {
-            $this->order->tables()->detach();
-        }
-
-        $this->order->update([
-            'checked_out' => true,
-            'total' => $this->totalPrice,
-            'cash' => $this->cash,
-            'change' => $this->change,
-            'tip' => $this->enableServiceCharge ? $this->config->tip : 0,
-            'ref_no' => $this->paymentType == 'check' ? $this->refNo : null,
-        ]);
-
-        $receipts = $this->order->orderReceipts;
-
-        if($this->order->billing_type == "multiple")
-        {
-            $amount = $this->totalPrice / $this->order->orderReceipts->count();
-        }
-
-        foreach($receipts as $receipt)
-        {
-            $r = OrderReceipt::find($receipt->id);
-            if($r->amount != null){
-                $r->update([
-                    'receipt_no' => $this->config->receipt_no,
-                ]);
-            }else{
-                $r->update([
-                    'receipt_no' => $this->config->receipt_no,
-                    'amount' => $amount ?? $this->totalPrice,
-                ]);
+        DB::transaction(function () {
+            if (count($this->order->tables) > 0) {
+                $this->order->tables()->detach();
             }
 
-            $this->config->increment('receipt_no');
-        }
-        $this->dispatchBrowserEvent('printPO', ['orderId' => $this->order->id]);
+            $this->order->update([
+                'checked_out' => true,
+                'total' => $this->totalPrice,
+                'cash' => $this->cash,
+                'change' => $this->change,
+                'tip' => $this->enableServiceCharge ? $this->config->tip : 0,
+                'ref_no' => $this->paymentType == 'check' ? $this->refNo : null,
+            ]);
 
-        event(new AnyOrderUpdatedEvent());
-        $this->close();
+            $receipts = $this->order->orderReceipts;
+
+            if($this->order->billing_type == "multiple")
+            {
+                $amount = $this->totalPrice / $this->order->orderReceipts->count();
+            }
+
+            foreach($receipts as $receipt)
+            {
+                $r = OrderReceipt::find($receipt->id);
+                if($r->amount != null){
+                    $r->update([
+                        'receipt_no' => $this->config->receipt_no,
+                    ]);
+                }else{
+                    $r->update([
+                        'receipt_no' => $this->config->receipt_no,
+                        'amount' => $amount ?? $this->totalPrice,
+                    ]);
+                }
+
+                $this->config->increment('receipt_no');
+            }
+            $this->dispatchBrowserEvent('printPO', ['orderId' => $this->order->id]);
+
+            event(new AnyOrderUpdatedEvent());
+            $this->close();
+        });
+
+
     }
 
     public function render()

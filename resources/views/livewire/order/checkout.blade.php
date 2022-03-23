@@ -28,7 +28,7 @@
               From: "opacity-100 translate-y-0 sm:scale-100"
               To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           -->
-            <div
+            <div x-data="checkout()" x-init="init()"
                 class="inline-block bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-96">
                 <div class="flex flex-col justify-between h-screen">
                     <div class="flex-shrink flex bg-white py-3">
@@ -153,7 +153,9 @@
                                 Cash:
                             </span>
                             <div class="flex flex-col">
-                                <x-input class="text-right h-8" wire:model.number="cash" wire:keyup="computeChange"
+                                <x-input class="text-right h-8"
+                                    {{-- wire:model.number="cash" wire:keyup="computeChange"  --}}
+                                    x-model="cash" x-on:keyUp="computeChange()"
                                     id="cash" type="number" />
                                 @error('cash')
                                 <span class="text-xs text-red-500 text-right">
@@ -167,7 +169,8 @@
                             <span>
                                 Change:
                             </span>
-                            <span>₱ {{ number_format($change, 2, '.', ',') ?? '0' }} </span>
+                            {{-- <span>₱ {{ number_format($change, 2, '.', ',') ?? '0' }} </span> --}}
+                            ₱ <span x-text="change"></span>
                         </div>
 
                         <button type="button" wire:click="confirmCheckOut" id="cOut" wire:loading.attr="disabled"
@@ -191,6 +194,26 @@
 </div>
 
 <script>
+    function checkout()
+    {
+        return {
+            totalPrice : @entangle('totalPrice').defer,
+            cash : @entangle('cash').defer,
+            change : @entangle('change').defer,
+            init(){
+                this.change = numberWithCommas(0)
+            },
+            computeChange() {
+                this.change = this.cash - this.totalPrice
+                this.change = numberWithCommas(this.change)
+            },
+        }
+    }
+
+    function numberWithCommas(x) {
+        return x.toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     window.addEventListener('printPO', event => {
         var button = document.getElementById('cOut');
         if(button != null) button.disabled = true;

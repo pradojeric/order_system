@@ -120,8 +120,8 @@ class OrderController extends Controller
 
                 // Enter the share name for your USB printer here
                 //$connector1 = new WindowsPrintConnector("smb://L403-PC38/POS-58");
-                // $connector1 = new WindowsPrintConnector("POS-58");
-                $connector1 = new NetworkPrintConnector($config->network_printer, 9100);
+                $connector1 = new WindowsPrintConnector("POS-58");
+                // $connector1 = new NetworkPrintConnector($config->network_printer, 9100);
 
                 /* Print a "Hello world" receipt" */
                 $printer = new Printer($connector1);

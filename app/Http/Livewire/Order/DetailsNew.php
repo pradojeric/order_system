@@ -53,7 +53,7 @@ class DetailsNew extends Component
         })->toArray();
 
         if ($this->order->getAttributes()) {
-            $this->oldOrders = $this->order->orderDetails;
+            $this->oldOrders = $this->order->orderDetails->load(['dish', 'sideDishes.dish']);
             $this->oldCustomOrders = $this->order->customOrderDetails;
             $this->pax = $this->order->pax;
         }
@@ -61,8 +61,6 @@ class DetailsNew extends Component
 
     public function createOrder()
     {
-
-
         DB::transaction(function () {
 
             if ($this->order->getAttributes() == null) {
@@ -84,46 +82,35 @@ class DetailsNew extends Component
             }
 
             $orderDetails = [];
-            $customDishes = [];
+
 
             try {
                 foreach ($this->orderedDishes as $item) {
-                    if (array_key_exists('id', $item)) {
 
-                        $orderDetails = $this->order->orderDetails()->create( [
-                            'dish_id' => $item['id'],
-                            'pcs' => $item['quantity'],
-                            'price' => $item['price'] * $item['quantity'],
-                            'price_per_piece' => $item['price'],
-                            'note' => $item['note'],
-                            'printed' => 0,
-                        ]);
+                    $orderDetails = $this->order->orderDetails()->create( [
+                        'dish_id' => $item['id'],
+                        'pcs' => $item['quantity'],
+                        'price' => $item['price'] * $item['quantity'],
+                        'price_per_piece' => $item['price'],
+                        'note' => $item['note'],
+                        'printed' => 0,
+                    ]);
 
-                        if(array_key_exists('sideDishes', $item) && $item['sideDishes'] != null)
+                    if(array_key_exists('sideDishes', $item) && $item['sideDishes'] != null)
+                    {
+                        foreach($item['sideDishes'] as $side)
                         {
-                            foreach($item['sideDishes'] as $side)
-                            {
-                                $orderDetails->sideDishes()->create([
-                                    'side_dish_id' => $side['id']
-                                ]);
-                            }
+                            $orderDetails->sideDishes()->create([
+                                'side_dish_id' => $side['id']
+                            ]);
                         }
-
-                    } else {
-                        $customDishes[] = [
-                            'name' => str_replace("(Custom)", "", $item['name']),
-                            'pcs' => $item['quantity'],
-                            'description' => $item['desc'],
-                            'price' => $item['price'],
-                            'price_per_piece' => $item['price_per_piece'],
-                            'type' => $item['type'],
-                            'printed' => 0,
-                        ];
                     }
+
+
                 }
 
-                if (count($customDishes) > 0) {
-                    $this->order->customOrderDetails()->createMany($customDishes);
+                if (count($this->customDishes) > 0) {
+                    $this->order->customOrderDetails()->createMany($this->customDishes);
                 }
 
                 $this->config->increment('order_no');
