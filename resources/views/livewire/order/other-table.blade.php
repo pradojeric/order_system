@@ -40,25 +40,18 @@
                         <button
                             class="text-xs py-1 px-2 rounded-md text-white bg-green-500"
                             wire:click="$emitTo('order.modal.discount', '{{ "openDiscount.{$order->id}" }}' )">{{ __('Discount') }}</button>
-                    {{-- @if ($enableDiscount)
-                    <button class="text-xs py-1 px-2 rounded-md text-white bg-green-500 hover:bg-green-700"
-                        wire:click="discountSave">Save</button>
-                    @endif
-                    @if($isSaved)
-                    <i class="fa fa-check text-green-500"></i>
-                    @endif --}}
-                </div>
-                {{-- @if($enableDiscount)
-                <div class="flex flex-col mt-1 space-y-1">
-                    <x-select class="h-8 text-xs" wire:model="discountType">
-                        <option value="percent">{{ _('Percent') }}</option>
-                        <option value="fixed">{{ _('Fixed') }}</option>
-                    </x-select>
-                    <x-input
-                        class="text-right text-xs p-2 {{ $errors->get('discount') ? 'border border-red-500' : '' }}"
-                        wire:model="discount" />
-                </div>
-                @endif --}}
+
+                    </div>
+                    <div class=" flex items-center mt-2">
+
+                        <div class="text-xs">
+
+                            <input type="checkbox" class="rounded" id="service_charge{{ $order->id }}" value=1 {{ !$order->enable_tip ? 'checked' : '' }}  wire:model="enableServiceCharge">
+                            <label for="service_charge{{ $order->id }}" class="text-gray-500" >Disable Service Charge</label>
+
+                        </div>
+                    </div>
+
                 @endcan
 
                 @else
@@ -67,11 +60,17 @@
 
             </div>
             <div class="flex items-center w-8">
-                <button type="button" class="w-5" @if(!empty($order))
-                    wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $order->id }}, 1, 'order')">
-                    @endif
-                    <i class="fa fa-trash {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
-                </button>
+                @if(!empty($order))
+                <div wire:loading>
+                    <i class="fa fa-spin fa-spinner"></i>
+                </div>
+                <div wire:loading.remove>
+
+                    <button type="button" class="w-5" wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $order->id }}, 1, 'order')">
+                        <i class="fa fa-trash {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
+                    </button>
+                </div>
+                @endif
             </div>
         </div>
         <div class="rounded-b-lg text-center text-sm font-bold">

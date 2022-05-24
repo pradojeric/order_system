@@ -68,7 +68,11 @@ class Report extends Component
 
     public function render()
     {
-        $orders =  Order::where('checked_out', 1)
+        $orders =  Order::with([
+            'waiter' => function($query){
+                $query->withTrashed();
+            },
+        ])->where('checked_out', 1)
             ->when($this->dateType == 'single', function($query){
                 $query->whereDate('created_at', $this->date);
             })

@@ -23,8 +23,8 @@ class ServiceType extends Component
     public function render()
     {
         $tables = Table::query();
-        $takeOuts = Order::where('action', 'Take Out')->where('checked_out', 0);
-        $deliveries = Order::where('action', 'Delivery')->where('checked_out', 0);
+        $takeOuts = Order::with(['orderDetails', 'customOrderDetails', 'waiter', 'orderReceipts'])->where('action', 'Take Out')->where('checked_out', 0);
+        $deliveries = Order::with(['orderDetails', 'customOrderDetails', 'waiter', 'orderReceipts'])->where('action', 'Delivery')->where('checked_out', 0);
 
         if (Auth::user()->hasRole('waiter')) {
             //
@@ -36,7 +36,7 @@ class ServiceType extends Component
 
         $takeOuts = $takeOuts->get();
         $deliveries = $deliveries->get();
-        $tables = $tables->get();
+        $tables = $tables->with(['orders.waiter', 'orders.orderDetails', 'orders.customOrderDetails', 'orders.orderReceipts'])->get();
 
         return view('livewire.order.service-type', [
             'tables' => $tables,

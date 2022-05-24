@@ -4,21 +4,22 @@
         <div
             class="flex flex-row items-center justify-between py-2 px-3 {{ $hasOrder ? 'bg-green-800' : 'bg-gray-300' }} rounded-t-lg">
             <strong class="text-white">
-                {{ Auth::user()->assignTables->find($table->id)->pivot->table_name ?? $table->name }} ({{ $table->pax }} pax)
+                {{ Auth::user()->assignTables->find($table->id)->pivot->table_name ?? $table->name }} ({{ $table->pax }}
+                pax)
             </strong>
             <div class="text-white">
                 @if($hasOrder)
                     @can('manage')
-                        <button wire:click.prevent="$emitTo('order.modal.transfer-table', 'transferOrder', {{ $table->order()->id }})">
+                        <button
+                            wire:click.prevent="$emitTo('order.modal.transfer-table', 'transferOrder', {{ $table->order()->id }})">
                             <i class="fa fa-exchange-alt"></i>
                         </button>
                     @endcan
-                    <button onclick="event.preventDefault(); print({{ $table->order()->id  }})">
-                        <i class="fa fa-print"></i>
-                    </button>
+                        <button onclick="event.preventDefault(); print({{ $table->order()->id  }})">
+                            <i class="fa fa-print"></i>
+                        </button>
                 @endif
-                <button
-                    wire:click.prevent="$emitTo('order.modal.edit-table', 'editTable', {{ $table->id }})">
+                <button wire:click.prevent="$emitTo('order.modal.edit-table', 'editTable', {{ $table->id }})">
                     <i class="fa fa-edit"></i>
                 </button>
             </div>
@@ -27,15 +28,16 @@
             <div class="flex h-full">
                 <div class="w-64 p-2">
                     @if($hasOrder)
+
                     <div>
-                        <a
-                            href="{{ route('orders.show', ['action' => 'dine_in', 'tableId' => $table->id, 'order' => $table->order()]) }}">
+                        <a href="{{ route('orders.show', ['action' => 'dine_in', 'tableId' => $table->id, 'order' => $table->order()]) }}">
                             <ul class="list-unstyled text-xs">
                                 <li>Order # {{ $table->order()->order_number }}</li>
                                 <li>
                                     Amount: ₱ {{ number_format( $table->order()->totalPrice(), 2, '.', ',') }}
                                     <span class="line-through">
-                                        {{ $order->enable_discount ? number_format( $table->order()->totalPriceWithoutDiscount(), 2, '.', ',') : '' }}
+                                        {{ $order->enable_discount ? number_format(
+                                        $table->order()->totalPriceWithoutDiscount(), 2, '.', ',') : '' }}
                                     </span>
                                 </li>
                                 <li>Pax: {{ $table->order()->pax }}</li>
@@ -45,42 +47,20 @@
                     </div>
                     @can('manage')
                         <livewire:order.modal.discount :order="$table->order()" key="discount-{{ $table->order()->id }}" />
-                            <div class="flex flex-row mt-2 items-center space-x-2">
-                                <button
-                                    class="text-xs py-1 px-2 rounded-md text-white bg-green-500"
-                                    wire:click="$emitTo('order.modal.discount', '{{ "openDiscount.{$table->order()->id}" }}' )">{{ __('Discount') }}</button>
-                                {{-- @if ($enableDiscount)
-                                    <button class="text-xs py-1 px-2 rounded-md text-white bg-green-500 hover:bg-green-700"
-                                        wire:click="discountSave">Save</button>
-                                @endif
-                                @if($isSaved)
-                                    <i class="fa fa-check text-green-500"></i>
-                                @endif --}}
-                            </div>
-                        {{-- <div class="flex flex-row mt-2 items-center space-x-2">
-                            <button
-                                class="text-xs py-1 px-2 rounded-md text-white {{  !$enableDiscount ? 'bg-green-500 hover:bg-green-700' : 'bg-red-500 hover:bg-red-700' }}"
-                                wire:click="$emit('openDiscount')">{{ !$enableDiscount ? 'Enable Discount' : 'Disable'}}</button>
-                            @if ($enableDiscount)
-                                <button class="text-xs py-1 px-2 rounded-md text-white bg-green-500 hover:bg-green-700"
-                                    wire:click="discountSave">Save</button>
-                            @endif
-                            @if($isSaved)
-                                <i class="fa fa-check text-green-500"></i>
-                            @endif
-                        </div> --}}
+                        <div class="flex flex-row mt-2 items-center space-x-2">
+                            <button class="text-xs py-1 px-2 rounded-md text-white bg-green-500"
+                                wire:click="$emitTo('order.modal.discount', '{{ "openDiscount.{$table->order()->id}" }}')">{{ __('Discount') }}</button>
+                        </div>
 
-                        {{-- @if($enableDiscount)
-                            <div class="flex flex-col mt-1 space-y-1">
-                                <x-select class="h-8 text-xs" wire:model="discountType">
-                                    <option value="percent">{{ _('Percent') }}</option>
-                                    <option value="fixed">{{ _('Fixed') }}</option>
-                                </x-select>
-                                <x-input
-                                    class="text-right text-xs p-2 {{ $errors->get('discount') ? 'border border-red-500' : '' }}"
-                                    wire:model="discount" />
+                        <div class=" flex items-center mt-2">
+
+                            <div class="text-xs">
+
+                                <input type="checkbox" class="rounded" id="service_charge{{ $table->order()->id }}" value=1 {{ !$table->order()->enable_tip ? 'checked' : '' }}  wire:model="enableServiceCharge">
+                                <label for="service_charge{{ $table->order()->id }}" class="text-gray-500" >Disable Service Charge</label>
+
                             </div>
-                        @endif --}}
+                        </div>
                     @endcan
                     @else
                         <a href="{{ route('orders.create', ['action' => 'dine_in', 'tableId' => $table->id]) }}">
@@ -89,17 +69,19 @@
                             </span>
                         </a>
                     @endif
-
                 </div>
                 <div class="flex items-center w-8">
                     @if($hasOrder)
                     <div wire:loading>
                         <i class="fa fa-spin fa-spinner"></i>
                     </div>
-                    <button type="button" class="w-5"
-                        wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $table->order()->id }}, 1, 'order')">
-                        <i class="fa fa-trash {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
-                    </button>
+                    <div wire:loading.remove>
+
+                            <button type="button" class="w-5"
+                            wire:click.prevent="$emitTo('auth.passcode', 'voidPasscode', {{ $table->order()->id }}, 1, 'order')">
+                            <i class="fa fa-trash {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
+                        </button>
+                    </div>
                     @endif
                 </div>
             </div>
@@ -108,9 +90,12 @@
             @if ($hasOrder)
             <div class="flex items-end">
                 <div class="w-full">
-                    <livewire:order.modal.billing-type :billingType="$table->order()->billing_type" :order="$table->order()" key="billing-{{ $table->order()->id }}" />
+                    <livewire:order.modal.billing-type :billingType="$table->order()->billing_type"
+                        :order="$table->order()" key="billing-{{ $table->order()->id }}" />
                 </div>
-                <button type="button" class="w-full {{ count($table->order()->orderReceipts) > 0 ? 'text-red-500' : 'text-gray-300' }} font-bold" type="button" {{ count($table->order()->orderReceipts) > 0 ? '' : 'disabled' }}
+                <button type="button"
+                    class="w-full {{ count($table->order()->orderReceipts) > 0 ? 'text-red-500' : 'text-gray-300' }} font-bold"
+                    type="button" {{ count($table->order()->orderReceipts) > 0 ? '' : 'disabled' }}
                     wire:click.prevent="$emitTo('order.checkout', 'checkOut', {{ $table->order()->id }})">
                     Check out
                 </button>

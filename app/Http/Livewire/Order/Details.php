@@ -6,9 +6,6 @@ use App\Models\Dish;
 use App\Models\Order;
 use Livewire\Component;
 use App\Models\Category;
-use App\Models\CustomDish;
-use App\Models\OrderDetails;
-use App\Events\OrderUpdatedEvent;
 
 class Details extends Component
 {
@@ -43,14 +40,18 @@ class Details extends Component
 
     public function mount(Order $order = null)
     {
-
         $this->order = $order;
         $this->isReviewing = false;
-        $this->categories = Category::all();
-        $dishes = Category::find(1)->dishes->sortBy('name');
+        $this->sideDishes = Dish::sideDish()->get();
+        $this->categories = Category::with(['dishes'])->get();
+        // $dishes = Category::with(['dishes'])->find(1)->dishes->sortBy('name');
+        // $dishes = $this->categories->where('id', 1)->dishes->sortBy('name');
+        $dishes = $this->categories->where('id', 1)->first()->dishes->sortBy('name');
+
         $this->dishes = $dishes->each(function ($dish) {
             $dish['quantity'] = 1;
         });
+
         if ($this->order->getAttributes()) {
             $this->oldOrders = $this->order->orderDetails;
             $this->oldCustomOrders = $this->order->customOrderDetails;
@@ -65,18 +66,15 @@ class Details extends Component
     public function viewDishes($categoryId = null)
     {
         $this->dishes = [];
-        $this->sideDishes = [];
+
         if ($categoryId) {
             $this->selectedCategory = $categoryId;
-            $category = Category::find($categoryId);
+            // $category = Category::with(['dishes'])->find($categoryId);
+            $category = $this->categories->where('id', $categoryId)->first();
             $dishes = $category->dishes->sortBy('name');
             $this->dishes = $dishes->each(function ($dish) {
                 $dish['quantity'] = 1;
             });
-            if($category->add_on)
-            {
-                $this->sideDishes = Dish::sideDish()->get();
-            }
         }
     }
 

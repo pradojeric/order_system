@@ -3,7 +3,7 @@
     <div class="px-4 py-2 w-auto">
         <div class="flex items-center space-x-2">
             <span class="text-xs w-32">
-                {{ _('Select Category') }}
+                {{ __('Select Category') }}
             </span>
             <x-select name="category_id" wire:model="category" id="category_id" class="block mt-1 font-medium text-sm">
                 <option value="0" selected>Select All</option>
@@ -15,7 +15,7 @@
 
         <div class="flex items-center space-x-2">
             <span class="text-xs w-32">
-                {{ _('Show Pages') }}
+                {{ __('Show Pages') }}
             </span>
             <x-select name="pages" wire:model="pages" id="pages" class="block mt-1 font-medium text-sm">
                 @foreach ([10, 25, 50, 100, "All"] as $page)

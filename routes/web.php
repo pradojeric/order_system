@@ -15,6 +15,8 @@ use App\Http\Controllers\WaiterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigurationController;
 use App\Events\PrintKitchenEvent;
+use App\Http\Livewire\Test;
+use App\Models\OrderDetails;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,10 +33,26 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/test-print-kitchen/{id}', function($id){
-    event(new PrintKitchenEvent(Order::find($id)));
-    return "print";
+Route::get('/test-order/{waiter_id?}', function($waiter_id = null) {
+    $orderIds = Order::when($waiter_id, function($q) use ($waiter_id){
+        $q->where('waiter_id', $waiter_id);
+    })->get()->pluck('id');
+
+    $orderDetails = OrderDetails::whereIn('order_id', $orderIds)
+        ->select('dish_id', DB::raw('SUM(order_details.pcs) as pcs'), DB::raw('SUM(order_details.price) as price'))
+        ->groupBy('dish_id')
+        ->get();
+
+    foreach($orderDetails as $d){
+        echo "Dish: ".$d->dish->name."<br>";
+        echo $d->pcs."<br>";
+        echo $d->price."<br>";
+        if($d->isDrink()) echo "is Drink";
+        if($d->isFood()) echo "is Food";
+        echo "<br><br>";
+    }
 });
+
 
 Route::get('/kitchen', KitchenPrint::class);
 
@@ -59,6 +77,9 @@ Route::middleware('guest')->post('/login-passcode', [WaiterController::class, 'l
 
 
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/test-vue-livewire', Test::class);
+
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::put('/users/edit-profile', [UserController::class, 'editProfile'])->name('edit-profile');
     Route::get('/waiter-order', [WaiterController::class, 'waiterOrder']);
@@ -87,6 +108,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/receipt-number-update', [ConfigurationController::class, 'editReceiptNo']);
         Route::put('/tin-number-update', [ConfigurationController::class, 'editTinNo']);
         Route::put('/tip-update', [ConfigurationController::class, 'editTip']);
+        Route::put('/take-out-charge-update', [ConfigurationController::class, 'editTakeOutCharge']);
+        Route::put('/network-printer-update', [ConfigurationController::class, 'editNetworkPrinter']);
 
         Route::delete('/dishes/deactivate/{dish}', [DishController::class, 'deactivate'])->name('dishes.deactivate');
         Route::get('/dishes/restore/{dish}', [DishController::class, 'restore'])->name('dishes.restore');

@@ -26,8 +26,7 @@
     @livewireStyles
 
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+
 
 </head>
 
@@ -40,8 +39,11 @@
             {{ $slot }}
         </main>
     </div>
-    @livewireScripts
+
 </body>
+@livewireScripts
+<!-- Scripts -->
+<script src="{{ asset('js/app.js') }}"></script>
 <script>
     // First we get the viewport height and we multiple it by 1% to get a value for a vh unit
 let vh = window.innerHeight * 0.01;

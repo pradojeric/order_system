@@ -64,21 +64,59 @@ class Order extends Model
         return $this->belongsTo(User::class, 'waiter_id');
     }
 
+    public function isCheck()
+    {
+        return $this->attributes['ref_no'] != null;
+    }
+
     public function totalPrice()
     {
-        $total =  $this->totalPriceWithoutDiscount();
+        // $total =  $this->totalPriceWithoutDiscount();
 
-        if ($this->enable_discount == true) {
-            if ($this->discount_type === 'percent') {
-                $total = $total - ($total * $this->discount / 100);
+        // if ($this->enable_discount == true) {
+        //     if ($this->discount_type === 'percent') {
+        //         $total = $total - ($total * $this->discount / 100);
+        //     }
+
+        //     if ($this->discount_type === 'fixed') {
+        //         $total = $total - $this->discount;
+        //     }
+        // }
+
+        // return $total;
+        if($this->enable_discount){
+            if($this->discount_settings == 'whole')
+            {
+                $total =  $this->totalPriceWithoutDiscount();
+
+                if ($this->discount_type === 'percent') {
+                    $total = $total - ($total * $this->discount / 100);
+                }
+
+                if ($this->discount_type === 'fixed') {
+                    $total = $total - $this->discount;
+                }
+
+                return $total;
             }
 
-            if ($this->discount_type === 'fixed') {
-                $total = $total - $this->discount;
+            if($this->discount_settings == 'per_item')
+            {
+                $customPrices = $this->customOrderDetails->sum(function($item){
+                    return $item->getPrice();
+                });
+                $orderPrices = $this->orderDetails->sum(function($item){
+                    return $item->getPrice();
+                });
             }
+
+
+
+            return $customPrices + $orderPrices;
         }
 
-        return $total;
+        return $this->totalPriceWithoutDiscount();
+
     }
 
     public function totalPriceWithServiceCharge()
@@ -104,35 +142,36 @@ class Order extends Model
     public function serviceCharge()
     {
         $config = Configuration::first();
-        if($this->action == "Dine In")
-            return $this->totalPrice() * ($config->tip / 100);
-        else
-            return 50;
-        // return $this->totalPrice() * ($this->tip / 100);
+
+        if($this->enable_tip) {
+            if($this->action == "Dine In")
+                return $this->totalPrice() * ($config->tip / 100);
+            else
+                return $config->take_out_charge;
+        }
+        return 0;
     }
 
     public function serviceChargeFromDB()
     {
         // $config = Configuration::first();
         // return $this->totalPrice() * ($config->tip / 100);
-        if($this->action == "Dine In")
-            return $this->totalPrice() * ($this->tip / 100);
-        else
-            return 50;
+        if($this->enable_tip) {
+            if($this->action == "Dine In")
+                return $this->totalPrice() * ($this->tip / 100);
+            else
+                return $this->take_out_charge;
+        }
+        return 0;
     }
 
     public function getDiscountOptionAttribute()
     {
         $discount = '';
         if ($this->enable_discount) {
-            if ($this->discount_type == 'percent') {
-                $discount = $this->discount . '%';
-                $discount = ' (' . $discount . ') ' . number_format($this->totalDiscountedPrice(), 2, '.', ',');
-            }
-            if ($this->discount_type == 'fixed') {
-                $discount = number_format($this->discount, 2, '.', ',');
-                $discount = number_format($this->totalDiscountedPrice(), 2, '.', ',');
-            }
+
+            $discount = number_format($this->discount, 2, '.', ',');
+            $discount = number_format($this->totalDiscountedPrice(), 2, '.', ',');
 
         } else {
             $discount = '-';

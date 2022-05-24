@@ -49,7 +49,7 @@ class Dishes extends Component
         $category = $this->category;
         $pages = $this->pages != "All" ? $this->pages : Dish::all()->count();
         return view('livewire.admin.dishes', [
-            'dishes' => Dish::when($category != 0, function($query) use ($category){
+            'dishes' => Dish::with('category')->when($category != 0, function($query) use ($category){
                     return $query->whereHas('category', function($query) use ($category) {
                         $query->where('id' , $category);
                     });

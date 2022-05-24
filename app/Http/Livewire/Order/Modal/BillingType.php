@@ -15,7 +15,13 @@ class BillingType extends Modal
     public $isBillEqualPrice;
     public Order $order;
 
-    public $receipts = [ [] ];
+    public $receipts = [
+        [
+            'name' => '-',
+            'address' => '-',
+            'contact' => '-',
+        ]
+    ];
 
     protected $rules = [
         'receipts.*.name' => 'required',

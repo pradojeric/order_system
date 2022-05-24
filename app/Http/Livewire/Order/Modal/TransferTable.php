@@ -16,6 +16,10 @@ class TransferTable extends Modal
     public $newTable;
     public $newServer;
 
+    protected $rules = [
+        'newServer' => 'required'
+    ];
+
     protected $listeners = ['transferOrder' => 'transferOrder'];
 
     public function transferOrder($orderId)
@@ -26,7 +30,11 @@ class TransferTable extends Modal
 
     public function confirmTransfer()
     {
-        $this->order->tables()->sync($this->newTable);
+        $this->validate();
+        if($this->newTable)
+        {
+            $this->order->tables()->sync($this->newTable);
+        }
         $this->order->update([
             'waiter_id' => $this->newServer,
         ]);

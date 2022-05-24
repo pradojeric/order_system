@@ -30,4 +30,11 @@ class CustomDish extends Model
     {
         return $this->type == "foods";
     }
+
+    public function discountItem()
+    {
+        return $this->morphOne(DiscountedItem::class, 'discountable');
+    }
+
+
 }
