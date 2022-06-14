@@ -171,8 +171,8 @@ class Review extends Modal
 
         });
 
-        event(new AnyOrderUpdatedEvent());
-        event(new PrintKitchenEvent($this->order));
+        // event(new AnyOrderUpdatedEvent());
+        // event(new PrintKitchenEvent($this->order));
         $this->dispatchBrowserEvent('printOrder', ['orderId' => $this->order->id]);
 
         // return redirect()->to('/waiter-order');

@@ -33,7 +33,7 @@
 
 
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link href="/admin/reports" :active="request()->is('admin/reports')">
+                    <x-nav-link href="/admin/reports" :active="request()->is('admin/reports*')">
                         {{ __('Report') }}
                     </x-nav-link>
                 </div>
@@ -71,7 +71,7 @@
                         @can('manage')
                             <x-dropdown-link href="/admin/config">
                                 {{ __('Config') }}
-                            </x-dropdown-link>                     
+                            </x-dropdown-link>
 
                             <x-dropdown-link :href="route('admin.tables.index')">
                                 {{ __('Table') }}

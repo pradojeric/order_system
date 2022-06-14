@@ -46,11 +46,9 @@ class DishController extends Controller
 
         $this->validate($request, [
             'name' => 'required',
-            'description' => 'required',
+            'properties' => 'required',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'add_on' => 'nullable',
-            'sides' => 'nullable',
         ]);
 
         try {
@@ -62,10 +60,8 @@ class DishController extends Controller
 
         $category->dishes()->create([
             'name' => $request->name,
-            'description' => $request->description,
+            'properties' => $request->properties,
             'price' => $request->price,
-            'add_on' => $request->add_on ?? false,
-            'sides' => $request->side_dish ?? false,
         ]);
 
         return redirect()->route('admin.dishes.index')->with('message', 'Dish successfully added');
@@ -108,20 +104,16 @@ class DishController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'description' => 'required',
+            'properties' => 'required',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'add_on' => 'nullable',
-            'sides' => 'nullable',
         ]);
 
         $dish->update([
             'name' => $request->name,
-            'description' => $request->description,
+            'properties' => $request->properties,
             'price' => $request->price,
             'category_id' => $request->category_id,
-            'add_on' => $request->add_on ?? false,
-            'sides' => $request->side_dish ?? false,
         ]);
 
         return redirect()->route('admin.dishes.index')->with('message', 'Dish updated successfully');

@@ -17,9 +17,9 @@ class Dish extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function scopeSideDish($query)
+    public function orderDetails()
     {
-        return $query->where('sides', true);
+        return $this->hasMany(OrderDetails::class);
     }
 
     public function scopeActive($query)

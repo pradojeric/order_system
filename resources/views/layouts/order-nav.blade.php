@@ -8,11 +8,10 @@
 
                     <div class="text-left">
                         <div class="font-extrabold">
-                            {{ $table ? (Auth::user()->assignTables->find($table->id)->pivot->table_name ?? $table->name) : '' }}
                             Order # {{ $order->order_number ?? $config->order_no }}
                         </div>
                         <div class="text-sm text-gray-500">
-                            ({{ $action }})
+                            Order
                         </div>
                     </div>
                 </div>

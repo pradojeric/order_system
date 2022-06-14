@@ -23,41 +23,14 @@ class OrderController extends Controller
      * @param  \App\Models\Table  $table
      * @return \Illuminate\Http\Response
      */
-    public function create($action, $tableId = null)
+    public function create()
     {
-        switch ($action) {
-            case ('dine_in'):
-                $action = 'Dine In';
-                break;
-            case ('take_out'):
-                $action = 'Take Out';
-                break;
-            case ('delivery'):
-                $action = 'Delivery';
-                break;
-        }
-
-        $table = Table::find($tableId);
-        return view('order-details', compact('action', 'table'));
+        return view('order-details');
     }
 
-    public function show($action, Order $order, $tableId = null)
+    public function show(Order $order)
     {
-        //
-        switch ($action) {
-            case ('dine_in'):
-                $action = 'Dine In';
-                break;
-            case ('take_out'):
-                $action = 'Take Out';
-                break;
-            case ('delivery'):
-                $action = 'Delivery';
-                break;
-        }
-
-        $table = Table::find($tableId);
-        return view('show-order', compact('action', 'table', 'order'));
+        return view('show-order', compact('order'));
     }
 
     public function printReceipt(Order $order, $reprint = 0)
@@ -81,11 +54,6 @@ class OrderController extends Controller
 
                     if($i->isFood()){
                         $dishName = $i->dish->name;
-                        if($i->sideDishes) {
-                            foreach($i->sideDishes as $side){
-                                $description .= "\n side: ".$side->dish->name;
-                            }
-                        }
 
                         $foods[] = new item($dishName, $i->pcs, $description, $i->note);
                     }
@@ -96,22 +64,7 @@ class OrderController extends Controller
                 }
 
             }
-            $newc = [];
-            foreach ($order->customOrderDetails as $c) {
-                if($c->printed == false){
-                    $itemName = $c->name;
 
-                    if($c->isDrink()){
-                        $drinks[] = new item($itemName, $c->pcs, $c->description);
-                    }
-                    if($c->isFood()){
-                        $foods[] = new item($itemName, $c->pcs, $c->description);
-                    }
-                    $c->printed = true;
-                    $c->save();
-                    $newc[] = $c->id;
-                }
-            }
 
 
             $length = 60;
@@ -226,21 +179,6 @@ class OrderController extends Controller
                     $i->save();
                 // }
 
-            }
-
-
-            $newc = [];
-            foreach ($order->customOrderDetails as $c) {
-                // if($c->printed == false){
-                    $itemName = $c->name;
-
-                    if($c->isFood()){
-                        $foods[] = new item($itemName, $c->pcs, $c->description);
-                    }
-                    $c->printed = true;
-                    $c->save();
-                    $newc[] = $c->id;
-                // }
             }
 
 
@@ -393,28 +331,16 @@ class OrderController extends Controller
             $date = now()->toDateTimeString();
             $items = [];
             foreach ($order->orderDetails as $i) {
-                $items[] = new receiptItem($i->dish->name." X ".$i->pcs, number_format($i->price, 2, '.', ','), number_format($i->getDiscount(), 2, '.', ','));
+                $items[] = new receiptItem($i->dish->name." (". $i->dish->properties .") X ".$i->pcs, number_format($i->price, 2, '.', ','));
             }
 
-            foreach ($order->customOrderDetails as $i) {
-                $items[] = new receiptItem($i->name." X ".$i->pcs, number_format($i->price, 2, '.', ','), number_format($i->getDiscount(), 2, '.', ','));
-            }
-
-            $config = Configuration::first();
             $cash = new receiptItem('Cash', number_format($order->cash, 2, '.', ','));
             $change = new receiptItem('Change', number_format($order->change, 2, '.', ','));
-            $totalPrice = new receiptItem('Subtotal' , number_format($order->totalPrice(), 2, '.', ','));
-            if($order->action == "Dine In")
-                $config_tip = $config->tip.'%';
-            else
-                $config_tip = "";
-            $serviceCharge = new receiptItem('Service Charge '.$config_tip, number_format($order->serviceCharge(), 2, '.', ','));
-            $discount = new receiptItem('Discount' , $order->discount_option);
-            $totalDiscounted = new receiptItem('Total' , number_format($order->totalPriceWithServiceCharge(),2, '.', ','));
+            $totalPrice = new receiptItem('Total' , number_format($order->totalPriceWithoutDiscount(), 2, '.', ','));
 
             // Enter the share name for your USB printer here
-            $connector = new WindowsPrintConnector("POS-58-BAR");
-            // $connector = new WindowsPrintConnector("POS-58");
+            // $connector = new WindowsPrintConnector("POS-58-BAR");
+            $connector = new WindowsPrintConnector("POS-58");
 
             /* Print a "Hello world" receipt" */
             $printer = new Printer($connector);
@@ -422,24 +348,26 @@ class OrderController extends Controller
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->setEmphasis(true);
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-            $printer->text("SABINA\n");
+            $printer->text("KUWAGO\n");
             $printer->selectPrintMode();
-            $printer->text("Leisure Coast Resort\n");
-            $printer->text('Bonuan, Dagupan, 2400 Pangasinan');
+            $printer->text("Unibersidad de Dagupan\n");
             $printer->setEmphasis(false);
             $printer->feed();
 
             /* Title of receipt */
-            $length = 60;
+
             $printer->setEmphasis(true);
-            $printer->text("PURCHASE ORDER\n");
+            $printer->text("RECEIPT\n");
             $printer->setEmphasis(false);
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
 
             $printer->feed(2);
 
+            $printer->setFont(Printer::FONT_B);
+
             /* Items */
+            $length = 80;
             foreach ($items as $o) {
                 $printer->text($o->getAsString($length));
             }
@@ -447,26 +375,21 @@ class OrderController extends Controller
 
             /* Tax and total */
 
-            if($order->enable_discount)
-            {
-                $printer->text($totalPrice->getAsString($length));
-                $printer->text($discount->getAsString($length));
-            }
 
-            $printer->text($serviceCharge->getAsString($length));
-            $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
-            $printer->text($totalDiscounted->getAsString());
             $printer->selectPrintMode();
+            $printer->text($totalPrice->getAsString($length));
             $printer->text($cash->getAsString($length));
             $printer->text($change->getAsString($length));
 
             $printer->feed(2);
 
+            $printer->setFont(Printer::FONT_A);
+
+
             /* Footer */
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("This is not the official receipt\n");
             $printer->feed();
-            $printer->text("Server: " . $order->waiter->full_name . "\n");
             $printer->text("-----------------------\n");
             $printer->text($date . "\n");
 

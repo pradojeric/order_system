@@ -3,8 +3,12 @@
 use App\Models\Dish;
 use App\Models\User;
 use App\Models\Order;
-use App\Http\Livewire\Order\Details;
+use App\Models\Category;
+use App\Http\Livewire\Test;
+use App\Models\OrderDetails;
+use App\Events\PrintKitchenEvent;
 use App\Http\Livewire\KitchenPrint;
+use App\Http\Livewire\Order\Details;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DishController;
 use App\Http\Controllers\UserController;
@@ -14,9 +18,8 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WaiterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConfigurationController;
-use App\Events\PrintKitchenEvent;
-use App\Http\Livewire\Test;
-use App\Models\OrderDetails;
+use App\Http\Livewire\Auth\Report\Create;
+use App\Http\Livewire\Auth\Report\Show;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,28 +32,17 @@ use App\Models\OrderDetails;
 |
 */
 
+
+
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/test-order/{waiter_id?}', function($waiter_id = null) {
-    $orderIds = Order::when($waiter_id, function($q) use ($waiter_id){
-        $q->where('waiter_id', $waiter_id);
-    })->get()->pluck('id');
+Route::get('/test', function() {
+    return Category::with(['dishes.orderDetails.order' => function ($order) {
+        $order->whereDate('orders.created_at', date('Y-m-d'));
 
-    $orderDetails = OrderDetails::whereIn('order_id', $orderIds)
-        ->select('dish_id', DB::raw('SUM(order_details.pcs) as pcs'), DB::raw('SUM(order_details.price) as price'))
-        ->groupBy('dish_id')
-        ->get();
-
-    foreach($orderDetails as $d){
-        echo "Dish: ".$d->dish->name."<br>";
-        echo $d->pcs."<br>";
-        echo $d->price."<br>";
-        if($d->isDrink()) echo "is Drink";
-        if($d->isFood()) echo "is Food";
-        echo "<br><br>";
-    }
+    }])->get();
 });
 
 
@@ -62,15 +54,6 @@ Route::get('/print-kitchen/{order}', [OrderController::class, 'printKitchen']);
 Route::get('/print-bill/{order}', [OrderController::class, 'printBill']);
 Route::get('/print-waiter-report/{waiter}/{startDate}/{endDate?}', [WaiterController::class, 'printWaiterReport']);
 Route::get('/print-po/{order}', [OrderController::class, 'printPurchasOrder']);
-
-Route::get('/test', function () {
-    $orders = Order::with(['orderDetails', 'customOrderDetails'])
-        ->whereDate('created_at', now()->toDateString())
-        ->where('waiter_id', 3)
-        ->get();
-    return ($orders);
-
-});
 
 
 Route::middleware('guest')->post('/login-passcode', [WaiterController::class, 'loginViaPasscode']);
@@ -86,11 +69,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    Route::get('/waiter-dashboard', [waiterController::class, 'dashboard'])->name('waiter.dashboard');
+    Route::get('/waiter-dashboard', [WaiterController::class, 'dashboard'])->name('waiter.dashboard');
 
-    Route::get('/orders/create/{action}/{tableId?}', [OrderController::class, 'create'])->name('orders.create');
-    Route::get('/orders/show/{action}/{order}/{tableId?}', [OrderController::class, 'show'])->name('orders.show');
-    // Route::get('/orders/create/{action?}/{tableId?}', Details::class)->name('orders.create');
+    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::get('/orders/show/{order}', [OrderController::class, 'show'])->name('orders.show');
 
     Route::prefix('admin')->name('admin.')->group(function () {
 
@@ -103,6 +85,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('menus', CategoryController::class);
 
         Route::get('/reports', [ReportController::class, 'index']);
+        Route::get('/reports/create', Create::class);
+        Route::get('/reports/show/{report}', Show::class);
         Route::get('/config', [ConfigurationController::class, 'index']);
         Route::put('/order-number-update', [ConfigurationController::class, 'editOrderNo']);
         Route::put('/receipt-number-update', [ConfigurationController::class, 'editReceiptNo']);

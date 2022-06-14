@@ -2,13 +2,15 @@
 
 namespace App\Http\Livewire\Auth;
 
-use App\Models\CustomDish;
+use Carbon\Carbon;
 use App\Models\Dish;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Report as ReportModel;
 use Livewire\Component;
+use App\Models\Category;
+use App\Models\CustomDish;
 use App\Models\OrderDetails;
-use Carbon\Carbon;
 use Livewire\WithPagination;
 
 class Report extends Component
@@ -19,10 +21,9 @@ class Report extends Component
     public $date;
     public $tempDate;
     public $date2 = "";
-    public $action;
 
     public $cash;
-    public $creditCard;
+    public $gCash;
     public $total;
 
     public $paginate = 15;
@@ -30,7 +31,6 @@ class Report extends Component
     public function mount()
     {
         $this->date = now()->toDateString();
-        $this->action = 'all';
         $this->dateType = 'single';
     }
 
@@ -81,37 +81,24 @@ class Report extends Component
             });
 
         $this->total = $orders->sum('total');
-        $this->cash = (clone $orders)->whereNull('ref_no')->sum('total');
-        $this->creditCard = (clone $orders)->whereNotNull('ref_no')->sum('total');
+        $this->cash = (clone $orders)->wherePaymentType('cash')->sum('total');
+        $this->gCash = (clone $orders)->wherePaymentType('gcash')->sum('total');
 
-        $orders = $orders->when($this->action != 'all', function ($query) {
-                    $query->where('action', $this->action);
-                })->paginate($this->paginate);
+        $orders = $orders->paginate($this->paginate);
 
         return view('livewire.auth.report', [
-            'orders' =>$orders,
+            'orders' => $orders,
             'dishes' => Dish::leftJoin('order_details', 'dishes.id', 'dish_id')
                 ->leftJoin('orders', 'orders.id', 'order_details.order_id')
-                ->selectRaw('dishes.name, SUM(pcs) as quantity')
-                ->groupBy('dishes.name')
+                ->selectRaw('dishes.name, dishes.properties, SUM(pcs) as quantity')
+                ->groupBy('dishes.name', 'dishes.properties')
                 ->when($this->dateType == 'single', function($query){
                     $query->whereDate('orders.created_at', $this->date);
                 })
                 ->when($this->dateType == 'range', function($query) {
                     $query->whereRaw('DATE(orders.created_at) BETWEEN ? AND ?', [$this->date, $this->date2]);
                 })
-                ->when($this->action != 'all', function ($query) {
-                    $query->where('orders.action', $this->action);
-                })
-                ->get(),
-            'customDishes' => CustomDish::leftJoin('orders', 'orders.id', 'custom_dishes.order_id')
-                ->when($this->dateType == 'single', function($query){
-                    $query->whereDate('orders.created_at', $this->date);
-                })
-                ->when($this->dateType == 'range', function($query) {
-                    $query->whereRaw('DATE(orders.created_at) BETWEEN ? AND ?', [$this->date, $this->date2]);
-                })
-                ->where('orders.checked_out', 1)
+                ->orderBy('name')
                 ->get(),
             'waiters' => User::
                 // whereHas('role', function ($role) {
@@ -138,6 +125,29 @@ class Report extends Component
                     ]
                 )
                 ->get(),
+            'overalls' => Category::with([
+                'dishes' => function ($dish) {
+                    $dish->orderBy('name');
+                },
+                'dishes.orderDetails' => function ($order) {
+                    $order->when($this->dateType == 'single', function($query){
+                        $query->whereDate( 'created_at', $this->date );
+                    })
+                    ->when($this->dateType == 'range', function($query) {
+                        $query->whereRaw( 'DATE(created_at) BETWEEN ? AND ?', [$this->date, $this->date2] );
+                    });
+                },
+                'dishes.orderDetails.order' => function ($order) {
+                    $order->when($this->dateType == 'single', function($query){
+                        $query->whereDate( 'created_at', $this->date );
+                    })
+                    ->when($this->dateType == 'range', function($query) {
+                        $query->whereRaw( 'DATE(created_at) BETWEEN ? AND ?', [$this->date, $this->date2] );
+                    });
+                },
+            ])
+            ->get(),
+           'reports' => ReportModel::paginate($this->paginate),
         ]);
     }
 }

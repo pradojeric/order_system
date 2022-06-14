@@ -29,7 +29,7 @@
               To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           -->
             <div x-data="checkout()" x-init="init()"
-                class="inline-block bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-96">
+                class="inline-block bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-xl">
                 <div class="flex flex-col justify-between h-screen">
                     <div class="flex-shrink flex bg-white py-3">
                         <div class="flex-shrink-0 flex flex-col items-start justify-center px-5">
@@ -71,38 +71,25 @@
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col flex-shrink justify-center">
 
-                        <div class="text-sm flex flex-row justify-between mb-2">
+                        <div class="text-sm font-bold flex flex-row justify-between mb-2">
                             <span>
-                                SubTotal:
+                                Name:
                             </span>
                             <span>
-                                ₱ {{number_format( $subTotal, 2, '.', ',') }}
+                                {{ $order->full_name }}
                             </span>
                         </div>
 
-                        <!-- if Enable Discount -->
-                        @if($enableDiscount)
-
-                            <div class="text-xs flex flex-row justify-between mb-2">
+                        @if($order->care_off)
+                            <div class="text-sm font-bold flex flex-row justify-between mb-2">
                                 <span>
-                                    Discount:
+                                    Care Off:
                                 </span>
                                 <span>
-                                    ({{ $discount }})
+                                    {{ $order->by }}
                                 </span>
                             </div>
                         @endif
-                        <!-- End Enable Discount -->
-
-                        <div class="text-xs flex flex-row justify-between mb-2">
-                            <span>
-                                Service Charge:
-                            </span>
-
-                            <span class="{{ $enableServiceCharge ? '' : 'line-through' }}">
-                                {{number_format( $serviceCharge, 2, '.', ',') }}
-                            </span>
-                        </div>
 
                         <div class="text-sm font-bold flex flex-row justify-between mb-2">
                             <span>
@@ -118,35 +105,19 @@
                             <span>
                                 Payment Type:
                             </span>
-                            <div class="flex space-x-2">
-                                <div class="flex">
+                            <div class="flex space-x-3">
+                                <div class="flex space-x-2 items-center">
                                     <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="cash"
                                         value="cash" />
                                     <x-label for="cash" :value="__('Cash')" />
                                 </div>
-                                <div class="flex">
-                                    <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="check"
-                                        value="check" />
-                                    <x-label for="check" :value="__('Check')" />
+                                <div class="flex space-x-2 items-center">
+                                    <x-input type="radio" name="paymentType" wire:model.lazy="paymentType" id="gcash"
+                                        value="gcash" />
+                                    <x-label for="gcash" :value="__('GCash')" />
                                 </div>
                             </div>
                         </div>
-
-                        @if($paymentType == 'check')
-                        <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
-                            <span>
-                                Ref Number:
-                            </span>
-                            <div class="flex flex-col">
-                                <x-input class="text-right h-8" wire:model="refNo" type="text" />
-                                @error('refNo')
-                                <span class="text-xs text-red-500 text-right">
-                                    {{ $message }}
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
-                        @endif
 
                         <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
                             <span>
@@ -155,6 +126,7 @@
                             <div class="flex flex-col">
                                 <x-input class="text-right h-8"
                                     {{-- wire:model.number="cash" wire:keyup="computeChange"  --}}
+                                    x-bind:disabled="paid ? true : false"
                                     x-model="cash" x-on:keyUp="computeChange()"
                                     id="cash" type="number" />
                                 @error('cash')
@@ -200,8 +172,10 @@
             totalPrice : @entangle('totalPrice').defer,
             cash : @entangle('cash').defer,
             change : @entangle('change').defer,
+            paid : false,
             init(){
-                this.change = numberWithCommas(0)
+                this.change = numberWithCommas(this.cash - this.totalPrice)
+                if(this.change >= 0) this.paid = true
             },
             computeChange() {
                 this.change = this.cash - this.totalPrice
@@ -219,13 +193,14 @@
         if(button != null) button.disabled = true;
 
         var id = event.detail.orderId;
-        a = window.open('/print-po/'+id, 'myWin', 'left=50, top=50, width=400, height=800');
-        a.screenX = 0;
-        a.screenY = 0;
-        a.document.title = "Print";
-        a.focus();
+        // a = window.open('/print-po/'+id, 'myWin', 'left=50, top=50, width=400, height=800');
+        // a.screenX = 0;
+        // a.screenY = 0;
+        // a.document.title = "Print";
+        // a.focus();
         setTimeout(() => {
-            a.close();
+            // a.close();
+            location.href="{{ url('/waiter-order') }}"
         }, 1000);
     });
 </script>

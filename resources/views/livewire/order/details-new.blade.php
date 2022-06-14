@@ -12,12 +12,12 @@
                     <div class="grid grid-cols-3 md:grid-cols-5">
 
                         @foreach ($categories as $category)
-                            <x-menu-card :img="asset($category->icon)" :category="$category->name"
+                            <x-menu-card :img="asset('storage/'.$category->icon)" :category="$category->name"
                                 @click="selectCategory( {{ $category->id }} )"
                                 ::class=" selectedCategory == {{ $category->id }} ? 'border-green-500' : '' " />
                         @endforeach
 
-                        <x-menu-card :img=" asset('icons/Custom.png')" @click="addCustom" category="Custom" />
+                        {{-- <x-menu-card :img=" asset('icons/Custom.png')" @click="addCustom" category="Custom" /> --}}
                     </div>
                     <div x-show="isLoading">
                         <div class="flex justify-center items-center mt-3 w-full">
@@ -36,8 +36,7 @@
                                     <div class="flex flex-col">
                                         <span x-text="dish.name">
                                         </span>
-                                        <span class="text-xs text-green-900" x-text="dish.add_on ? 'with side dishes' : ''">
-                                        </span>
+                                        <span x-text="dish.properties" class="text-sm"></span>
                                     </div>
                                     <div x-text="numberWithCommas(dish.price)">
                                     </div>
@@ -85,13 +84,6 @@
                                                 <span>
                                                     {{ $item->dish->name }}
                                                 </span>
-                                                <span class="text-xs">
-                                                    <ul>
-                                                        @foreach ($item->sideDishes as $side)
-                                                            <li>with: {{ $side->dish->name }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                </span>
                                                 <span>
                                                     {{ $item->note ? "note: ".$item->note : '' }}
                                                 </span>
@@ -105,29 +97,7 @@
                                         </div>
                                     </div>
                                 @endforeach
-                                @foreach($oldCustomOrders as $i => $item)
-                                    <div class="flex justify-around mb-5 xl:text-sm text-xs">
-                                        <button type="button" class="w-5">
-                                            <i class="fa fa-minus-circle {{ Gate::check('manage') ? 'text-red-500' : 'text-gray-200' }}"></i>
-                                        </button>
-                                        <div class="flex flex-col w-28">
-                                            <div class="flex flex-col">
-                                                <span>
-                                                    {{ $item->name }}
-                                                </span>
-                                                <span class="text-xs">
-                                                    {{ "Desc: ".$item->description }}
-                                                </span>
-                                            </div>
-                                            <div>
-                                                X{{ $item['pcs'] }}
-                                            </div>
-                                        </div>
-                                        <div class="flex items-end">
-                                            ₱ {{number_format( $item['price'], 2, '.', ',') }}
-                                        </div>
-                                    </div>
-                                @endforeach
+
                             @endif
                             <template x-for="(orderedDish, index) in orderedDishes" :key="index">
                                 <div class="flex justify-around mb-5 xl:text-sm text-xs">
@@ -139,16 +109,8 @@
                                             <span x-text="orderedDish.name"></span>
 
                                             <div class="text-xs">
-                                                <template x-if="orderedDish.sideDishes">
-                                                    <ul>
-                                                        <template x-for="side in orderedDish.sideDishes">
-                                                            <li>with: <span class="text-xs" x-text="side.name"></span></li>
-                                                        </template>
-                                                    </ul>
-                                                </template>
-
                                                 <div>
-                                                    <span x-text="orderedDish.desc"></span>
+                                                    <span x-text="orderedDish.properties"></span>
                                                 </div>
                                                 <div x-show="orderedDish.note != ''">
                                                     Note: "<span x-text="orderedDish.note"></span>"
@@ -165,92 +127,11 @@
                                 </div>
                             </template>
 
-                            <template x-for="(cDish, index) in customDishes" :key="index">
-                                <div class="flex justify-around mb-5 xl:text-sm text-xs">
-                                    <button type="button" class="w-5" @click="removeCustom(index)">
-                                        <i class="fa fa-minus-circle text-red-500"></i>
-                                    </button>
-                                    <div class="flex flex-col w-28" >
-                                        <div class="flex flex-col">
-                                            <div>
-                                                <span x-text="cDish.name"></span>
-                                            </div>
-                                            <div class="text-xs">
-                                                <div>
-                                                    Desc: <span x-text="cDish.description"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            X <span x-text="cDish.pcs"></span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-end">
-                                        ₱ <span x-text="numberWithCommas(cDish.price_per_piece * cDish.pcs)"></span>
-                                    </div>
-                                </div>
-                            </template>
-
                         </div>
 
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div x-show="customModal" x-cloak>
-            <x-modal>
-                <x-slot name="header">
-                    Custom Order
-                </x-slot>
-
-                <template x-for="(error, index) in errors" :key="`custom` + index">
-                    <span x-text="error" class="text-red-500 text-xs text-center"></span>
-                </template>
-
-                <div class="flex flex-col px-4">
-                    <x-label for="customDish">{{ __('Dish Name*') }}</x-label>
-                    <x-input type="text" class="w-full" id="customDish" x-model="customDish" required />
-
-                </div>
-                <div class="flex flex-col px-4">
-                    <x-label for="customDescription">{{ __('Dish Description*') }}</x-label>
-                    <x-textarea type="text" class="w-full" id="customDescription" x-model="customDesc"
-                        required />
-
-                </div>
-                <div class="px-4">
-                    <x-label for="type" :value="__('Dish Type*')"></x-label>
-                    <x-select id="type" class="block mt-1 w-full font-medium text-sm" x-model="customType">
-                        <option selected>Select Type</option>
-                        <option value="foods">Foods</option>
-                        <option value="drinks">Drinks</option>
-                        <option value="alcoholic">Alcoholic</option>
-                    </x-select>
-
-                </div>
-                <div class="flex flex-col px-4">
-                    <x-label for="customPrice">{{ __('Dish Price*') }}</x-label>
-                    <x-input type="number" class="w-full" id="customPrice" x-model="customPrice" required />
-
-                </div>
-                <div class="flex flex-col px-4">
-                    <x-label for="customPcs">{{ __('Dish Quantity*') }}</x-label>
-                    <x-input type="number" class="w-full" id="customPcs" x-model="customPcs" required />
-
-                </div>
-
-                <x-slot name="buttons">
-                    <button type="button" @click="confirmCustom"
-                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Add
-                    </button>
-                    <button type="button" @click="cancelCustom"
-                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancel
-                    </button>
-                </x-slot>
-            </x-modal>
         </div>
 
         <div x-show="addOnModal" x-cloak>
@@ -263,20 +144,7 @@
                     <span class="text-base font-medium">Add Note</span>
                     <x-textarea class="w-full" x-model="note"></x-textarea>
                 </div>
-                <div x-show="selectedDish['add_on']">
 
-                    <div class="flex flex-col px-4">
-                        <span class="text-base font-medium">Choose two side dishes</span>
-                        <span x-text="errors.add_on" class="text-red-500 text-xs"></span>
-                        @foreach ($sideDishes as $i => $addon)
-                            <div class="flex">
-                                <input class="mr-2" type="checkbox" id="addon{{ $addon->id }}" value="{{ json_encode($addon) }}" x-model="selectedAddOns"  />
-                                <x-label for="addon{{ $addon->id }}" :value="$addon->name" />
-                            </div>
-                        @endforeach
-                    </div>
-
-                </div>
                 <x-slot name="buttons">
                     <button type="button" @click="confirmDish"
                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
@@ -313,23 +181,8 @@
                             </div>
                         </div>
                     </template>
-                    <template x-for="(cDish, index) in customDishes" :key="'custom' + index">
-                        <div class="flex justify-between text-sm w-full">
-                            <div class="flex flex-col">
-                                <div class="flex flex-col">
-                                    <span x-text="cDish.name"></span>
 
-                                </div>
-                                <div class="ml-2">
-                                    X <span x-text="cDish.pcs"></span>
-                                </div>
-                            </div>
-                            <div class="flex items-end">
-                                ₱ <span x-text="numberWithCommas(cDish.price_per_piece * cDish.pcs)"></span>
-                            </div>
-                        </div>
-                    </template>
-                    <div class="text-center text-sm" x-show="customDishes.length < 1 && orderedDishes.length < 1">
+                    <div class="text-center text-sm" x-show="orderedDishes.length < 1">
                         No order Yet
                     </div>
 
@@ -337,6 +190,30 @@
 
                 <x-slot name="footer">
                     <span class="text-red-500 text-xs text-center" x-text="errors.order"></span>
+
+                    <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
+                        <span>
+                            Name:
+                        </span>
+                        <div class="flex flex-col">
+                            <x-input class="h-8"
+                                x-model="full_name"
+                                id="full_name" type="text" />
+                        </div>
+                    </div>
+
+                    <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
+                        <div class="flex space-x-2">
+                            <x-input type="checkbox" value=1 name="care_off" id="care_off" x-model="care_off"  />
+                            <x-label for="care_off" class="text-sm font-bold text-black" :value="__('Care Off')" />
+                        </div>
+                        <div class="flex flex-col">
+                            <x-input class="h-8"
+                                x-model="by"
+                                id="by" type="text" x-bind:disabled="!care_off" x-bind:class="!care_off ? 'bg-gray-200' : ''" />
+                        </div>
+                    </div>
+
                     <div class="font-bold flex flex-row justify-between mb-2 text-sm">
                         <span>
                             Total:
@@ -345,38 +222,51 @@
                             ₱ <span x-text="numberWithCommas(totalPrice)"></span>
                         </div>
                     </div>
-                    <div class="font-bold flex flex-row justify-between items-center mb-2 text-sm">
+
+                    <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
                         <span>
-                            Pax:
+                            Payment Type:
                         </span>
-                        <div class="flex flex-col">
-                            <x-input class="text-right h-8" type="number" x-model="pax"></x-input>
+                        <div class="flex space-x-3">
+                            <div class="flex items-center space-x-2">
+                                <x-input type="radio" name="paymentType" x-model="paymentType" id="pcash"
+                                    value="cash" />
+                                <x-label for="pcash" :value="__('Cash')" />
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <x-input type="radio" name="paymentType" x-model="paymentType" id="gcash"
+                                    value="gcash" />
+                                <x-label for="gcash" :value="__('GCash')" />
+                            </div>
                         </div>
                     </div>
-                    @if($action == 'Delivery')
-                    <div class="font-bold flex flex-row justify-between items-center mb-2 text-sm">
+
+                    <div class="text-sm font-bold flex flex-row justify-between mb-2 items-center">
                         <span>
-                            Address:
+                            Cash:
                         </span>
                         <div class="flex flex-col">
+                            <x-input class="text-right h-8"
+                                x-model="cash" x-on:keyUp="computeChange()"
+                                id="cash" type="number" />
                         </div>
                     </div>
-                    <div class="font-bold flex flex-row justify-between items-center mb-2 text-sm">
+
+                    <div class="text-sm font-bold flex flex-row justify-between mb-2">
                         <span>
-                            Contact:
+                            Change:
                         </span>
-                        <div class="flex flex-col">
-                        </div>
+
+                        ₱ <span x-text="change"></span>
                     </div>
-                    @endif
+
                     <button type="button" :disabled="confirmedOrder" @click="confirmOrder" :class="confirmedOrder ? 'bg-green-900 cursor-wait' : ' bg-green-500 hover:bg-green-700'"
                         class="mt-3 py-2 w-full text-center rounded-lg text-white text-sm">
                         <div class="mr-2" x-show="confirmedOrder">
                             <i class="fas fa-circle-notch fa-spin"></i>
                         </div>
                         <div x-show="!confirmedOrder">
-
-                            Place Order on {{ $table->name ?? $action }}
+                            Place Order
                         </div>
                     </button>
                     <button type="button" @click="cancelReview" :disabled="confirmedOrder" :class="confirmedOrder ? 'bg-red-900 cursor-wait' : 'bg-red-500 hover:bg-red-700'"
@@ -401,19 +291,15 @@
             categories : @entangle('categories').defer,
             dishes : @entangle('dishes').defer,
             totalPrice : @entangle('totalPrice').defer,
-            pax: @entangle('pax').defer,
             orderedDishes: @entangle('orderedDishes').defer,
-            customDishes: @entangle('customDishes').defer,
-            address: @entangle('address').defer,
-            contact: @entangle('contact').defer,
+            cash : @entangle('cash').defer,
+            change : @entangle('change').defer,
+            full_name: @entangle('fullName').defer,
+            paymentType: @entangle('paymentType').defer,
+            care_off: @entangle('care_off').defer,
+            by: @entangle('by').defer,
             addOnModal : false,
             reviewModal : false,
-            customModal : false,
-            customDish : '',
-            customType : '',
-            customDesc : '',
-            customPrice : 0,
-            customPcs : 1,
             confirmedOrder : false,
             isLoading : true,
             selectedAddOns : [],
@@ -448,81 +334,20 @@
             },
             confirmDish(){
                 var same = false
-                var addOns = []
                 this.selectedDish['note'] = this.note
 
-                if(this.selectedDish['add_on']) {
-                    if( this.selectedAddOns.length == 2 ) {
-
-                        this.selectedAddOns.forEach( (addOn, index) => {
-                            parsed = JSON.parse(addOn)
-                            try{
-                                var a = {}
-                                a['id'] = parsed['id']
-                                a['name'] = parsed['name']
-                                addOns.push(a)
-
-
-                            }catch(err){
-                                console.error(err)
-                            }
-                        })
-                        this.selectedDish['sideDishes'] = addOns
-
-                        this.selectedAddOns = []
-
-                    }else{
-                        this.errors['add_on'] = "You must select 2 side dishes"
-                        return
-                    }
-                }
-
                 this.orderedDishes.forEach( (item, index, arr) => {
-                    sideDishesCount = 0
                     parsed = convertToJSON(item)
 
                     if( this.selectedDish['id'] == parsed['id'] && this.selectedDish['note'] == parsed['note'] ) {
-                        console.log(parsed['sideDishes'])
-                        if (parsed['sideDishes'] != null) {
 
-                            if(parsed['sideDishes'].length > 0 ) {
-
-                                parsed['sideDishes'].forEach( (side, index) => {
-                                    console.log(side)
-
-                                    for(x of this.selectedDish['sideDishes']) {
-                                        console.log(x)
-                                        if(side['id'] == x['id']) {
-                                            sideDishesCount++
-                                        }
-                                    }
-
-                                })
-                            }
-                            console.log(sideDishesCount)
-                            if(sideDishesCount == 2 ) {
-
-                                arr[index]['quantity'] += dish['quantity']
-                                same = true
-                                return false
-                            }
-
-                        }
-                        else
-                        {
-                            arr[index]['quantity'] += dish['quantity']
-                            same = true
-                        }
-
-
+                        arr[index]['quantity'] += dish['quantity']
+                        same = true
                     }
 
                 })
-                console.log(this.selectedDish)
-                if(!same) {
-
+                if(!same)
                     this.orderedDishes.push(convertToJSON(this.selectedDish))
-                }
 
                 this.totalPrice += this.selectedDish['price'] * this.selectedDish['quantity']
                 this.selectedDish = false
@@ -530,75 +355,6 @@
                 this.note = ''
                 this.errors = []
 
-            },
-            addCustom(){
-                this.customModal = true
-                this.customDish = ''
-                this.customDesc = ''
-                this.customType = ''
-                this.customPrice = 0
-                this.customPcs = 1
-            },
-            confirmCustom(){
-                var errorCustom = 0
-                if(this.customDish == '')
-                {
-                    this.errors['name'] = 'Name is required'
-                    errorCustom += 1
-                }
-
-                if(this.customType == '')
-                {
-                    this.errors['type'] = 'Type is required'
-                    errorCustom += 1
-                }
-
-                if(this.customDesc == '')
-                {
-                    this.errors['description'] = 'Description is required'
-                    errorCustom += 1
-                }
-
-                if(this.customPrice < 1)
-                {
-                    this.errors['price'] = 'Price is required'
-                    errorCustom += 1
-                }
-
-                if(this.customPcs < 1)
-                {
-                    this.errors['quantity'] = 'Quantity is required'
-                    errorCustom += 1
-                }
-
-                if(errorCustom > 0)
-                {
-                    console.log(Object.values(this.errors))
-                    this.errors = Object.values(this.errors)
-                    return
-                }
-
-                this.customDishes.push({
-                    'name' : this.customDish,
-                    'pcs' : this.customPcs,
-                    'description' : this.customDesc,
-                    'price' : (this.customPrice * this.customPcs),
-                    'price_per_piece' : this.customPrice,
-                    'type' : this.customType,
-                    'printed' : 0,
-                })
-                this.totalPrice += this.customPrice * this.customPcs
-
-                this.cancelCustom()
-            },
-            cancelCustom(){
-                this.customModal = false
-                this.customDish = ''
-                this.customDesc = ''
-                this.customType = ''
-                this.customPrice = 0
-                this.customPcs = 1
-                this.errors = []
             },
             cancelAddOn(){
                 this.addOnModal = false
@@ -609,28 +365,26 @@
                 this.totalPrice -= dish['price'] * dish['quantity']
                 this.orderedDishes.splice(index, 1)
             },
-            removeCustom(index){
-                custom = this.customDishes[index]
-                this.totalPrice -= custom.price
-                this.customDishes.splice(index, 1)
-            },
             reviewOrder() {
                 this.reviewModal = true
             },
             cancelReview() {
                 this.errors = []
                 this.reviewModal = false
+                this.cash = 0
+            },
+            computeChange() {
+                this.change = numberWithCommas(this.cash - this.totalPrice)
             },
             confirmOrder() {
 
-                if(this.orderedDishes.length < 1 && this.customDishes.length < 1) {
-                    this.errors['order'] = "Please add order"
+                if(this.full_name === '') {
+                    this.errors['order'] = "Enter Name"
                     return
                 }
 
-                if (this.pax < 1) {
-
-                    this.errors['order'] = "Need more pax"
+                if(this.orderedDishes.length < 1) {
+                    this.errors['order'] = "Please add order"
                     return
                 }
 
@@ -653,7 +407,7 @@
 
         Livewire.emit('close');
         var id = event.detail.orderId;
-        a = window.open('/print/'+id, 'myWin', 'left=50, top=50, width=400, height=800');
+        a = window.open('/print-po/'+id, 'myWin', 'left=50, top=50, width=400, height=800');
         a.screenX = 0;
         a.screenY = 0;
         a.document.title = "Print";

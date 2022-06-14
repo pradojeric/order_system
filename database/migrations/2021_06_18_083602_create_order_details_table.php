@@ -20,7 +20,10 @@ class CreateOrderDetailsTable extends Migration
             $table->integer('pcs');
             $table->float('price_per_piece');
             $table->float('price');
+            $table->longText('note')->nullable();
+            $table->boolean('printed')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

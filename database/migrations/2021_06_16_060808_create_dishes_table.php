@@ -17,9 +17,9 @@ class CreateDishesTable extends Migration
             $table->id();
             $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
             $table->string('name');
-            $table->longText('description');
+            $table->longText('properties');
             $table->float('price');
-            $table->enum('status', [0, 1])->default(1);
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

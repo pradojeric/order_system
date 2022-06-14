@@ -34,21 +34,11 @@
                 </div>
 
                 <div class="mt-4">
-                    <x-label for="description" :value="__('Description')" />
+                    <x-label for="properties" :value="__('Properties')" />
 
-                    <x-textarea class="block mt-1 w-full" id="description" name="description" rows="5">
-                        {{ $dish->description }}
+                    <x-textarea class="block mt-1 w-full" id="properties" name="properties" rows="5">
+                        {{ $dish->properties }}
                     </x-textarea>
-                </div>
-
-                <div class="mt-4 flex">
-                    <input type="checkbox" name="add_on" id="add_on" value="1" class="mr-2" {{ $dish->add_on ? 'checked' : '' }} />
-                    <x-label for="add_on" :value="__('With Add-on')" />
-                </div>
-
-                <div class="mt-4 flex">
-                    <input type="checkbox" name="side_dish" id="side_dish" value="1" class="mr-2" {{ $dish->sides ? 'checked' : '' }} />
-                    <x-label for="side_dish" :value="__('Side dish')" />
                 </div>
 
                 <div class="mt-4">

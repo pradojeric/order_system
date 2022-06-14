@@ -9,7 +9,7 @@
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
             <div
-                class="inline-block overflow-hidden bg-white rounded-lg text-left shadow-xl transform transition-all w-96">
+                class="inline-block overflow-hidden bg-white rounded-lg text-left shadow-xl transform transition-all w-full max-w-lg">
                 <div class="flex flex-col justify-between h-screen">
                     <div class="flex flex-col flex-shrink bg-white py-2 lg:py-4 text-center">
                         {{ $header }}

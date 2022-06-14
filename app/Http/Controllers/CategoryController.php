@@ -51,7 +51,7 @@ class CategoryController extends Controller
         if (!empty($request->icon)) {
             $icon = $request->file('icon');
             $extension = $icon->extension();
-            $icon_name = $request->name . "." . $extension;
+            $icon_name = Str::slug($request->name) . "." . $extension;
             $path = $icon->storeAs('icons', $icon_name, 'public');
         }
 

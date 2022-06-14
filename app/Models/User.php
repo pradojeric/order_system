@@ -71,26 +71,24 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'waiter_id');
     }
 
-    public function ordersBy($action = null)
+    public function ordersBy()
     {
-        if ($action == null) {
-            $total = $this->orders->sum('total');
-        } else {
-            $total = $this->orders->where('action', $action)->sum('total');
-        }
-        return number_format($total, 2, '.', ',');
-    }
 
-    public function runInBar()
-    {
-        $total = $this->orders->map->orderDetails->flatten()->map(function($item) {
-            if($item->dish->category->type == 'alcoholic'){
-                return $item->price;
-            }
-        })->sum();
+        $total = $this->orders->sum('total');
 
         return number_format($total, 2, '.', ',');
     }
+
+    // public function runInBar()
+    // {
+    //     $total = $this->orders->map->orderDetails->flatten()->map(function($item) {
+    //         if($item->dish->category->type == 'alcoholic'){
+    //             return $item->price;
+    //         }
+    //     })->sum();
+
+    //     return number_format($total, 2, '.', ',');
+    // }
 
     public function runInKitchen()
     {
@@ -103,13 +101,13 @@ class User extends Authenticatable
         return number_format($total, 2, '.', ',');
     }
 
-    public function getTip()
-    {
-        $tip = $this->orders->map(function ($order) {
-            return ['orderTip' => $order->serviceCharge()];
-        })->sum('orderTip');
-        return number_format($tip, 2, '.', ',');
-    }
+    // public function getTip()
+    // {
+    //     $tip = $this->orders->map(function ($order) {
+    //         return ['orderTip' => $order->serviceCharge()];
+    //     })->sum('orderTip');
+    //     return number_format($tip, 2, '.', ',');
+    // }
 
     public function trashedOrders()
     {
@@ -130,10 +128,10 @@ class User extends Authenticatable
         return $this->cancelled->where('cancellable_type', '<>', 'App\Models\Order')->count();;
     }
 
-    public function assignTables()
-    {
-        return $this->belongsToMany(Table::class, 'table_waiter', 'waiter_id', 'table_id')->withPivot(['table_name']);
-    }
+    // public function assignTables()
+    // {
+    //     return $this->belongsToMany(Table::class, 'table_waiter', 'waiter_id', 'table_id')->withPivot(['table_name']);
+    // }
 
     public function cancelled()
     {
